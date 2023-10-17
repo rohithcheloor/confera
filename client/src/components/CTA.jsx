@@ -1,4 +1,5 @@
 import React from "react";
+import {Link} from "react-router-dom";
 
 function CTA() {
   return (
@@ -21,7 +22,7 @@ function CTA() {
             </div>
 
             <button id="joinRoomButton" class="button button-primary pulse">
-              Join Room
+              <Link to="/setup">Join Room</Link>
             </button>
             {"  "}
             <button
