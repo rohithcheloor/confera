@@ -789,6 +789,7 @@ em-emoji-picker {
 .swal2-popup {
   /* border: var(--border) !important; */
   border: 0.5px solid rgb(255 255 255 / 32%) !important;
+  padding:20px;
 }
 
 .swal2-popup .swal2-styled:focus {
@@ -798,7 +799,53 @@ em-emoji-picker {
 .swal2-timer-progress-bar-container {
   background: #376df9;
 }
-
+.swal2-container.swal2-bottom, .swal2-container.swal2-center{
+  grid-template-columns: auto minmax(0,1fr) auto;
+}
+.swal2-container.swal2-backdrop-show, .swal2-container.swal2-noanimation {
+  background: rgba(0,0,0,.4);
+}
+.swal2-container {
+  display: grid;
+  position: fixed;
+  z-index: 1060;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  grid-template-areas:
+      "top-start top top-end"
+      "center-start center center-end"
+      "bottom-start bottom-center bottom-end";
+  grid-template-rows: minmax(-webkit-min-content,auto) minmax(-webkit-min-content,auto) minmax(-webkit-min-content,auto);
+  grid-template-rows: minmax(min-content,auto) minmax(min-content,auto) minmax(min-content,auto);
+  height: 100%;
+  padding: 0.625em;
+  overflow-x: hidden;
+  transition: background-color .1s;
+  -webkit-overflow-scrolling: touch;
+}
+.swal2-container.swal2-center>.swal2-popup {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
+  justify-self: center;
+}
+.swal2-html-container {
+  z-index: 1;
+  justify-content: center;
+  margin: 1em 1.6em 0.3em;
+  padding: 0;
+  overflow: auto;
+  color: inherit;
+  font-size: 1.125em;
+  font-weight: 400;
+  line-height: normal;
+  text-align: center;
+  word-wrap: break-word;
+  word-break: break-word;
+}
 .img-about {
   margin: 0 !important;
 }
