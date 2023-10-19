@@ -2,6 +2,7 @@ import LandingPage from "../pages/LandingPage";
 import SetUpPage from "../pages/SetUpPage";
 import React from "react";
 import { BrowserRouter,Routes,Route } from "react-router-dom";
+import Login from "./Login";
 
 
 function App() {
@@ -12,7 +13,7 @@ function App() {
     // </div>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LandingPage/>}> </Route>
+        <Route path="/" element={<Login />}> </Route>
         <Route path="/setup" element={<SetUpPage/>}> </Route>
       </Routes>
     </BrowserRouter>
