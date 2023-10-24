@@ -31,3 +31,6 @@ h1{
     background: linear-gradient(45deg,#000000,#000154) ;
     color: #ffffff;
 }
+#room-tabs-tabpane-create,#room-tabs-tabpane-join{
+    padding: 1rem;
+}
