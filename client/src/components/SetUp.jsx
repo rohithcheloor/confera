@@ -1,46 +1,204 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 function SetUp() {
+  const [isVideoOn, setIsVideoOn] = useState(true);
+  const [isAudioOn, setIsAudioOn] = useState(true);
+  const [videoDevices, setVideoDevices] = useState([]);
+  const [audioDevices, setAudioDevices] = useState([]);
+  const [speakerDevices, setSpeakerDevices] = useState([]);
+  const [selectedVideoDevice, setSelectedVideoDevice] = useState(null);
+  const [selectedAudioDevice, setSelectedAudioDevice] = useState(null);
+  const [selectedSpeaker, setSelectedSpeaker] = useState(null);
+
+  const toggleVideo = () => {
+    setIsVideoOn((prev) => !prev);
+    const videoElement = document.getElementById("initVideo");
+
+    if (videoElement) {
+      if (isVideoOn) {
+        videoElement.pause();
+      } else {
+        videoElement.play();
+      }
+    }
+  };
+
+  const toggleAudio = () => {
+    setIsAudioOn((prev) => !prev);
+    const videoElement = document.getElementById("initVideo");
+
+    if (videoElement) {
+      const audioTracks = videoElement.srcObject.getAudioTracks();
+      audioTracks.forEach((track) => {
+        track.enabled = isAudioOn;
+      });
+    }
+  };
+
+  const getMediaDevices = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(
+        (device) => device.kind === "videoinput"
+      );
+      const audioDevices = devices.filter(
+        (device) => device.kind === "audioinput"
+      );
+      setVideoDevices(videoDevices);
+      setAudioDevices(audioDevices);
+      setSelectedVideoDevice(videoDevices[0]?.deviceId || null);
+      setSelectedAudioDevice(audioDevices[0]?.deviceId || null);
+    } catch (error) {
+      console.error("Error fetching media devices:", error);
+    }
+  };
+
+  const startVideoStream = async () => {
+    try {
+      const constraints = {
+        video: {
+          deviceId: selectedVideoDevice
+            ? { exact: selectedVideoDevice }
+            : undefined,
+        },
+        audio: {
+          deviceId: selectedAudioDevice
+            ? { exact: selectedAudioDevice }
+            : undefined,
+        },
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const videoElement = document.getElementById("initVideo");
+      if (videoElement) {
+        videoElement.srcObject = stream;
+      }
+    } catch (error) {
+      console.error("Error starting video stream:", error);
+    }
+  };
+
+  // Speaker
+
+  const getSpeakers = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const speakerDevices = devices.filter(
+        (device) => device.kind === "audiooutput"
+      );
+      setSelectedSpeaker(speakerDevices[0]?.deviceId || null);
+    } catch (error) {
+      console.error("Error fetching speaker devices:", error);
+    }
+  };
+
+  const setSpeaker = () => {
+    const audioElement = document.getElementById("initVideo");
+    if (audioElement) {
+      const audioOutput = selectedSpeaker
+        ? { deviceId: { exact: selectedSpeaker } }
+        : undefined;
+      audioElement.setSinkId(audioOutput);
+    }
+  };
+
+  useEffect(() => {
+    getMediaDevices();
+    getSpeakers();
+  }, []);
+
+  useEffect(() => {
+    if (selectedVideoDevice || selectedAudioDevice) {
+      startVideoStream();
+    }
+  }, [selectedVideoDevice, selectedAudioDevice, isVideoOn]);
+
+  useEffect(() => {
+    setSpeaker();
+  }, [selectedSpeaker]);
+
+  console.log("speakers..", speakerDevices);
+
   return (
     <section>
-        <div class="swal2-container swal2-center swal2-backdrop-show" style={{overflow: "auto"}}>
-        <div class="swal2-popup">
-        <h2 class="swal2-title" id="swal2-title" style={{display: "block"}}>Confera</h2>
-        <div id="initUser" class="init-user">
-            {/* <p>Please allow the camera & microphone access to use this app.</p> */}
-            <div class="container">
+      <div
+        className="swal2-container swal2-center swal2-backdrop-show"
+        style={{ overflow: "auto" }}
+      >
+        <div className="swal2-popup">
+          <h2
+            className="swal2-title"
+            id="swal2-title"
+            style={{ display: "block" }}
+          >
+            Confera
+          </h2>
+          <div id="initUser" className="init-user">
+            <div className="container">
+              {isVideoOn && (
                 <video
-                    id="initVideo"
-                    playsinline="true"
-                    autoplay=""
-                    class="mirror"
-                    poster="../images/loader.gif"
-                    style={{width:"100%"}}
+                  id="initVideo"
+                  playsInline={true}
+                  autoPlay={true}
+                  className="mirror"
+                  poster="../images/loader.gif"
+                  style={{ width: "100%" }}
                 ></video>
+              )}
             </div>
-            <button id="initVideoButton" class="fas fa-video"></button>
-            <button id="initAudioButton" class="fas fa-microphone"></button>
-                 
-            <select id="initVideoSelect" class="form-select text-light bg-dark">
-                <option>📹 HP TrueVision HD Camera </option>
+            <button
+              id="initVideoButton"
+              className={`fas fa-video ${isVideoOn ? "active" : ""}`}
+              onClick={toggleVideo}
+            ></button>
+            <button
+              id="initAudioButton"
+              className={`fas fa-microphone ${isAudioOn ? "active" : ""}`}
+              onClick={toggleAudio}
+            ></button>
+
+            <select
+              id="initVideoSelect"
+              className="form-select text-light bg-dark"
+              onChange={(e) => setSelectedVideoDevice(e.target.value)}
+            >
+              {videoDevices.map((device) => (
+                <option key={device.deviceId} value={device.deviceId}>
+                  {device.label || `Camera ${device.deviceId.substring(0, 5)}`}
+                </option>
+              ))}
             </select>
-            <select id="initMicrophoneSelect" class="form-select text-light bg-dark">
-                <option>🎤 Default - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)</option>
-                <option>🎤 Communications - Microphone Array (Intel® Smart Sound Technology for Digital Microphones)</option>
-                <option>🎤 Microphone Array (Intel® Smart Sound Technology for Digital Microphones)</option>
+
+            <select
+              id="initMicrophoneSelect"
+              className="form-select text-light bg-dark"
+              onChange={(e) => setSelectedAudioDevice(e.target.value)}
+            >
+              {audioDevices.map((device) => (
+                <option key={device.deviceId} value={device.deviceId}>
+                  {device.label ||
+                    `Microphone ${device.deviceId.substring(0, 5)}`}
+                </option>
+              ))}
             </select>
-            <select id="initSpeakerSelect" class="form-select text-light bg-dark">
-                <option>🔈 Default - Speaker (Realtek(R) Audio)</option>
-                <option>🔈 Communications - Speaker (Realtek(R) Audio)</option>
-                <option>🔈 Speaker (Realtek(R) Audio)</option>
+
+            <select
+              id="initSpeakerSelect"
+              className="form-select text-light bg-dark"
+              value={selectedSpeaker || ""}
+              onChange={(e) => setSelectedSpeaker(e.target.value)}
+            >
+              {speakerDevices.map((device) => (
+                <option key={device.deviceId} value={device.deviceId}>
+                  {device.label || `Speaker ${device.deviceId.substring(0, 5)}`}
+                </option>
+              ))}
             </select>
-            <input placeholder="Enter your name" class="swal2-input" type="text" maxlength="36" style={{ borderRadius: "6px" ,marginTop: "15px",marginRight: "15px",width:"50%",height:"50px"}}/>
-            <button class="button button-primary" style={{width:"150px"}}>Join meeting</button>
+
+            {/* ... rest of your code ... */}
+          </div>
         </div>
-        </div>
-        </div>
+      </div>
     </section>
-  
   );
 }
 
