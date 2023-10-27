@@ -7,7 +7,7 @@ const SetUpPage = (props) => {
   const { orgName } = props;
   return (
     <div>
-      <h1 className="ms-4 mt-4 text-white">{orgName}</h1>
+      <h1 className="ps-4 pt-4 text-white">{orgName}</h1>
       <Setup />
     </div>
   );

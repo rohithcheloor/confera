@@ -95,12 +95,14 @@ io.on('connection', (socket) => {
     });
 
     socket.on("accept", (payload) => {
+        console.log("SENDING ANSWER");
         io.to(payload.callerID).emit('answer', { signal: payload.signal, callerID: socket.id });
     });
 
     socket.on('disconnect', () => {
         const userStatus = activeSockets.find((user) => user.id === socket.id);
-
+        console.log(userStatus);
+        socket.to(userStatus.roomId).emit('user-disconnected', userStatus.id, userStatus.username);
         if (userStatus && userStatus.joined) {
             const user = userStatus;
             if (user.secureRoom) {
@@ -111,6 +113,5 @@ io.on('connection', (socket) => {
         }
 
         activeSockets.filter((user) => user.id !== socket.id);
-        console.log('Disconnected User : ' + socket.id);
     });
 });
