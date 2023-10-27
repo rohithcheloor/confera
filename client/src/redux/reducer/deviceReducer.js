@@ -4,6 +4,7 @@ const initState = {
   cameraID: null,
   microphoneID: null,
   speakerID: null,
+  isSetupComplete: false,
 };
 
 const DeviceReducer = (state = initState, { type, payload = {} }) => {
@@ -16,6 +17,7 @@ const DeviceReducer = (state = initState, { type, payload = {} }) => {
         cameraID: payload.cameraID,
         microphoneID: payload.microphoneID,
         speakerID: payload.speakerID,
+        isSetupComplete: payload.isSetupComplete,
       };
     case DEVICE.GET_CAMERA_ID:
       return state.cameraID;
@@ -29,6 +31,10 @@ const DeviceReducer = (state = initState, { type, payload = {} }) => {
       return { ...state, microphoneID: payload.microphoneID };
     case DEVICE.SET_SPEAKER_ID:
       return { ...state, speakerID: payload.speakerID };
+    case DEVICE.SET_SETUP_COMPLETED:
+      return { ...state, isSetupComplete: true };
+    case DEVICE.UNSET_SETUP_COMPLETED:
+      return { ...initState, isSetupComplete: false };
     default:
       return state;
   }

@@ -9,6 +9,7 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      orgName: null,
       roomId: "",
       password: "",
       username: "",
@@ -18,7 +19,22 @@ class Login extends Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    let orgName = process.env.REACT_APP_COMPANY_NAME;
+    if (this.state.orgName === null) {
+      if (
+        String(orgName) !== "" &&
+        String(orgName).toLowerCase().trim() !== "confera"
+      ) {
+        orgName = "Confera for " + orgName;
+      }
+      this.setState({ orgName: String(orgName).toUpperCase() });
+    } else{
+      if(!orgName){
+        orgName = "Confera"
+      }
+    }
+  }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.tabState !== prevState.tabState) {
@@ -111,10 +127,10 @@ class Login extends Component {
         style={{ height: "100vh" }}
       >
         <Row>
-          <h1 className="text-center text-white">CONFERA</h1>
+          <h1 className="text-center text-white">{this.state.orgName}</h1>
         </Row>
-        <Row className="uname-container">
-          <Col>
+        <Row  style={{padding:"1em"}}>
+          <Col className="uname-container">
             <Form>
               <Form.Group controlId="userName">
                 <Form.Label>Display Name:</Form.Label>
@@ -129,7 +145,7 @@ class Login extends Component {
             </Form>
           </Col>
         </Row>
-        <Row>
+        <Row style={{padding:"1em"}}>
           <Tabs
             id="room-tabs"
             activeKey={this.state.tabState}
@@ -162,7 +178,7 @@ class Login extends Component {
                     />
                   </Form.Group>
 
-                  <Form.Group controlId="enableSecureRoomJoin">
+                  <Form.Group controlId="enableSecureRoomJoin" style={{paddingTop: '1em'}}>
                     <Form.Check
                       type="checkbox"
                       label="Have a Password?"
@@ -207,7 +223,7 @@ class Login extends Component {
                     />
                   </Form.Group>
 
-                  <Form.Group controlId="enableSecureRoom">
+                  <Form.Group controlId="enableSecureRoom" style={{paddingTop: '1em'}}>
                     <Form.Check
                       type="checkbox"
                       label="Enable Secure Room"

@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap');
 body{
-    background: linear-gradient(45deg,#000000,#000154) ;
+    background: linear-gradient(45deg,#000000,#000154);
+    background-attachment: fixed;
 }
 h1{
     font-family: 'Tilt Neon', sans-serif;

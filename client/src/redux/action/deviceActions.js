@@ -19,7 +19,12 @@ export const setSpeaker = (speakerID) => {
   const payload = { speakerID };
   return { type: DEVICE.SET_SPEAKER_ID, payload };
 };
-
+export const setSetupCompleted = () => {
+  return { type: DEVICE.SET_SETUP_COMPLETED };
+};
+export const unsetSetupCompleted = () => {
+  return { type: DEVICE.UNSET_SETUP_COMPLETED };
+};
 export const getCamera = () => {
   return { type: DEVICE.GET_CAMERA_ID };
 };

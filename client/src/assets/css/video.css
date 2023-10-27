@@ -1,0 +1,36 @@
+.video-stream-1{
+    border-radius: 8px;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 100%;
+    height: 100%;
+    max-width: 200px;
+    max-height: 150px;
+    transform: rotateY(180deg);
+    box-shadow: 0px 0px 25px #ffffff4c;
+}
+.video-grid{
+    padding: 1em;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.video-stream-2{
+    margin: auto;
+    width: auto;
+    border-radius: 4px;
+    height: 100%;
+    max-height: 100vh;
+    transform: rotateY(180deg);
+}
+.room-input input{
+    margin: 1em;
+    padding: 1em;
+    border-radius: 4px;
+}
+.room-input button{
+    padding: 1em;
+    background-color: rgb(60, 60, 60);
+    color: white;
+    border: none;
+}
