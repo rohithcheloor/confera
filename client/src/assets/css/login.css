@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap');
 body{
-    background: linear-gradient(45deg,#000000,#000154) ;
+    background: linear-gradient(45deg,#000000,#000154);
+    background-attachment: fixed;
 }
 h1{
     font-family: 'Tilt Neon', sans-serif;
@@ -30,4 +31,7 @@ h1{
     border-radius: 0px;
     background: linear-gradient(45deg,#000000,#000154) ;
     color: #ffffff;
+}
+#room-tabs-tabpane-create,#room-tabs-tabpane-join{
+    padding: 1rem;
 }
