@@ -5,6 +5,7 @@ import "../assets/css/video.css";
 import VideoTile from "../components/Video";
 import { connect } from "react-redux";
 import { API_SERVER_URL } from "../utilities/constants";
+import { toast } from "react-toastify";
 
 const ConferencePage = (props) => {
   const { userData, deviceData } = props;
@@ -138,14 +139,14 @@ const ConferencePage = (props) => {
         item.peer.signal(payload.signal);
       });
 
-      socketRef.current.on("user-disconnected", (peerId, peerName) => {
-        console.log("USER DISCONNECTED", peerId);
+      socketRef.current.on("user-disconnected", (peerData) => {
+        const { peerId, peerName } = peerData;
+        toast(`${peerName} Disconnected`);
+        const newPeersList = peers.filter((peer) => peer.peerID !== peerId);
+        setPeers(newPeersList);
         const peerIndex = peersRef.current.findIndex(
           (peer) => peer.peerID === peerId
         );
-        const newPeersList = peers.filter((peer) => peer.peerID !== peerId);
-        setPeers(newPeersList);
-
         if (peerIndex) {
           peersRef.current.splice(peerIndex, 1);
         }
@@ -159,8 +160,6 @@ const ConferencePage = (props) => {
     }
   }, [myStream]);
 
-
-
   return (
     <React.Fragment>
       <video
@@ -172,8 +171,8 @@ const ConferencePage = (props) => {
       ></video>
       <div className="video-grid">
         {peers.map((peerItem, index) => {
-            return <VideoTile index={index} key={index} peer={peerItem} />;
-          })}
+          return <VideoTile index={index} key={index} peer={peerItem} />;
+        })}
         <p>{roomId}</p>
       </div>
     </React.Fragment>
