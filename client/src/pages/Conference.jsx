@@ -69,6 +69,7 @@ const ConferencePage = (props) => {
 
   useEffect(() => {
     const createPeer = (userToSignal, callerID, isInitiator) => {
+      console.log("Creating Peer");
       if (myStream) {
         const peer = new SimplePeer({
           initiator: isInitiator,
@@ -114,10 +115,20 @@ const ConferencePage = (props) => {
           }
         }
       });
-      setPeers(users);
+      if (peersRef && peersRef.current) {
+        const myPeersList = peersRef.current.map((item) => {
+          if (item.peer) {
+            item.peer.peerID = item.peerID;
+          }
+          return item.peer;
+        });
+        console.log(myPeersList);
+        setPeers(myPeersList);
+      }
     };
     if (myStream && socketRef.current) {
       socketRef.current.on("get-peers", (myPeers) => {
+        console.log("GET PEERS");
         addPeers(myPeers, true);
       });
 
@@ -128,7 +139,16 @@ const ConferencePage = (props) => {
             peerID: callerID,
             peer: newPeer,
           });
-          setPeers((users) => [...users, newPeer]);
+          if (peersRef && peersRef.current) {
+            const myPeersList = peersRef.current.map((item) => {
+              if (item.peer) {
+                item.peer.peerID = item.peerID;
+              }
+              return item.peer;
+            });
+            console.log(myPeersList);
+            setPeers(myPeersList);
+          }
         }
       });
 
@@ -142,13 +162,20 @@ const ConferencePage = (props) => {
       socketRef.current.on("user-disconnected", (peerData) => {
         const { peerId, peerName } = peerData;
         toast(`${peerName} Disconnected`);
-        const newPeersList = peers.filter((peer) => peer.peerID !== peerId);
-        setPeers(newPeersList);
-        const peerIndex = peersRef.current.findIndex(
-          (peer) => peer.peerID === peerId
-        );
-        if (peerIndex) {
-          peersRef.current.splice(peerIndex, 1);
+        console.log("Peers List", peersRef.current);
+        if (peersRef.current) {
+          const newPeersList = [];
+          peersRef.current.forEach((item, index) => {
+            if (item.peerID !== peerId) {
+              newPeersList.push(item.peer);
+            } else {
+              const disconnectedPeer = peersRef.current[index].peer;
+              delete peersRef.current[index];
+              disconnectedPeer.destroy();
+            }
+          });
+          console.log(newPeersList);
+          setPeers(newPeersList);
         }
       });
 
@@ -170,7 +197,8 @@ const ConferencePage = (props) => {
         muted
       ></video>
       <div className="video-grid">
-        {peers.map((peerItem, index) => {
+        {console.log("Updated Peers", peers)}
+        {peers.length > 0 && peers.map((peerItem, index) => {
           return <VideoTile index={index} key={index} peer={peerItem} />;
         })}
         <p>{roomId}</p>
