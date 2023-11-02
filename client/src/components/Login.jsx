@@ -4,6 +4,7 @@ import "../assets/css/login.css";
 import { api_post } from "../utilities/apiRequest";
 import { LoginUser } from "../redux/action/loginActions";
 import { connect } from "react-redux";
+import { toast } from "react-toastify";
 
 class Login extends Component {
   constructor(props) {
@@ -29,9 +30,9 @@ class Login extends Component {
         orgName = "Confera for " + orgName;
       }
       this.setState({ orgName: String(orgName).toUpperCase() });
-    } else{
-      if(!orgName){
-        orgName = "Confera"
+    } else {
+      if (!orgName) {
+        orgName = "Confera";
       }
     }
   }
@@ -44,6 +45,19 @@ class Login extends Component {
         api_post("api/generate-room-id").then((res) => {
           if (res.data) {
             this.setState({ roomId: res.data.roomId });
+          } else {
+            if (res.message) {
+              toast.error(res.message, {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+              });
+            }
           }
         });
       }
@@ -60,6 +74,19 @@ class Login extends Component {
         (res) => {
           if (res.data) {
             this.setState({ roomId: res.data.roomId });
+          } else {
+            if (res.message) {
+              toast.error(res.message, {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+              });
+            }
           }
         }
       );
@@ -90,6 +117,19 @@ class Login extends Component {
         null,
         true
       );
+    } else {
+      if (createRoom.data && createRoom.data.message) {
+        toast.error(createRoom.data.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      }
     }
   };
 
@@ -107,6 +147,20 @@ class Login extends Component {
         null,
         true
       );
+    } else {
+      console.log(authenticateRoom);
+      if (authenticateRoom.data && authenticateRoom.data.message) {
+        toast.error(authenticateRoom.data.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      }
     }
   };
 
@@ -129,7 +183,7 @@ class Login extends Component {
         <Row>
           <h1 className="text-center text-white">{this.state.orgName}</h1>
         </Row>
-        <Row  style={{padding:"1em"}}>
+        <Row style={{ padding: "1em" }}>
           <Col className="uname-container">
             <Form>
               <Form.Group controlId="userName">
@@ -145,7 +199,7 @@ class Login extends Component {
             </Form>
           </Col>
         </Row>
-        <Row style={{padding:"1em"}}>
+        <Row style={{ padding: "1em" }}>
           <Tabs
             id="room-tabs"
             activeKey={this.state.tabState}
@@ -178,7 +232,10 @@ class Login extends Component {
                     />
                   </Form.Group>
 
-                  <Form.Group controlId="enableSecureRoomJoin" style={{paddingTop: '1em'}}>
+                  <Form.Group
+                    controlId="enableSecureRoomJoin"
+                    style={{ paddingTop: "1em" }}
+                  >
                     <Form.Check
                       type="checkbox"
                       label="Have a Password?"
@@ -223,7 +280,10 @@ class Login extends Component {
                     />
                   </Form.Group>
 
-                  <Form.Group controlId="enableSecureRoom" style={{paddingTop: '1em'}}>
+                  <Form.Group
+                    controlId="enableSecureRoom"
+                    style={{ paddingTop: "1em" }}
+                  >
                     <Form.Check
                       type="checkbox"
                       label="Enable Secure Room"
