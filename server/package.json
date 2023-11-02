@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "start-dev": "nodemon server.js",
-    "debug": "DEBUG='mediasoup*' node app/src/Server.js"
+    "debug": "DEBUG='mediasoup*' node server.js"
   },
   "dependencies": {
     "@sentry/integrations": "7.73.0",
