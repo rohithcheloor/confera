@@ -1,3 +1,9 @@
-.room-details-page{
-    background: white !important;
+.room-details{
+    border: none;
+    font-size: 28px;
+    border-collapse: separate;
+    border-spacing: 10px;
+}
+.room-details td{
+    padding: 5px;
 }
