@@ -18,9 +18,10 @@ import { Server as socketIO } from "socket.io";
 import { createRoom, createRoomId } from "./api/createRoom.js";
 import { authenticateRoom } from "./api/joinRoom.js";
 import config from "./config.js";
-import { strict } from "assert";
+import { configDotenv } from "dotenv";
 
 const app = express();
+configDotenv();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -104,6 +105,7 @@ io.on("connection", (socket) => {
           }
         });
         if (room.participants) {
+          console.log(room.participants);
           const peers = room.participants.map((peer) => {
             if (!currentParticipants.includes(peer.id)) return peer.id;
           });

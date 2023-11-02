@@ -9,7 +9,7 @@ import {
 import "../assets/css/loading.css";
 
 const InitialConfig = (props) => {
-  const { loading, setLoading, unsetLoading, setOrgName } = props;
+  const { loading, setLoading, unsetLoading, orgName, setOrgName } = props;
   useEffect(() => {
     setLoading();
     let myOrgName = process.env.REACT_APP_COMPANY_NAME;
@@ -22,6 +22,7 @@ const InitialConfig = (props) => {
     } else {
       setOrgName(`Confera`);
     }
+    document.title = orgName;
     unsetLoading();
   }, []);
   return (
