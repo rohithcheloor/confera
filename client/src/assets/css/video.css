@@ -34,3 +34,15 @@
     color: white;
     border: none;
 }
+.buttons{
+    position: absolute;
+    bottom: 0;
+    margin: 10px;
+}
+.buttons .btnMain{
+    width: 50px;
+    height: 40px;
+}
+.font-icon{
+    font-size: 24px;
+}
