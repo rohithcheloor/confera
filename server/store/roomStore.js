@@ -130,6 +130,8 @@ const getRoom = (roomId, password, secureRoom = false) => {
     const room = roomArray.filter(roomItem => roomItem.roomId === roomId && (secureRoom ? roomItem.password === password : true));
     if (room.length > 0) {
         return { success: true, message: "Authenticated Successfully" }
+    }else{
+        return { success: false, message: "Room doesn't exist. Try Creating a new Room." }
     }
 }
 
