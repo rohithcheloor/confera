@@ -19,12 +19,14 @@ export const setSpeaker = (speakerID) => {
   const payload = { speakerID };
   return { type: DEVICE.SET_SPEAKER_ID, payload };
 };
+
 export const setSetupCompleted = () => {
   return { type: DEVICE.SET_SETUP_COMPLETED };
 };
 export const unsetSetupCompleted = () => {
   return { type: DEVICE.UNSET_SETUP_COMPLETED };
 };
+
 export const getCamera = () => {
   return { type: DEVICE.GET_CAMERA_ID };
 };
@@ -39,4 +41,15 @@ export const getSpeaker = () => {
 
 export const getDevices = () => {
   return { type: DEVICE.GET_DEVICES };
+};
+
+export const setIsAudioOn = (isOn) => {
+  const payload = { isOn };
+  console.log("payload", payload);
+  return { type: DEVICE.SET_ISAUDIO_ON, payload };
+};
+
+export const setIsVideoOn = (isOn) => {
+  const payload = { isOn };
+  return { type: DEVICE.SET_ISVIDEO_ON, payload };
 };

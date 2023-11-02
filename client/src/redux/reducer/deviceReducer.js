@@ -5,10 +5,23 @@ const initState = {
   microphoneID: null,
   speakerID: null,
   isSetupComplete: false,
+  isAudioOn: true,
+  isVideoOn: true,
 };
 
 const DeviceReducer = (state = initState, { type, payload = {} }) => {
   switch (type) {
+    case DEVICE.SET_ISAUDIO_ON:
+      console.log("here...", payload.isOn);
+      return {
+        ...state,
+        isAudioOn: payload.isOn,
+      };
+    case DEVICE.SET_ISVIDEO_ON:
+      return {
+        ...state,
+        isVideoOn: payload.isOn,
+      };
     case DEVICE.GET_DEVICES:
       return state;
     case DEVICE.SET_DEVICES:
@@ -26,6 +39,7 @@ const DeviceReducer = (state = initState, { type, payload = {} }) => {
     case DEVICE.GET_SPEAKER_ID:
       return state.speakerID;
     case DEVICE.SET_CAMERA_ID:
+      console.log("here...", payload);
       return { ...state, cameraID: payload.cameraID };
     case DEVICE.SET_MICROPHONE_ID:
       return { ...state, microphoneID: payload.microphoneID };

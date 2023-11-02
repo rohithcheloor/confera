@@ -1,18 +1,37 @@
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import SimplePeer from "simple-peer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faVideo,
+  faVideoSlash,
+  faMicrophone,
+  faMicrophoneSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import "../assets/css/video.css";
 import VideoTile from "../components/Video";
 import { connect } from "react-redux";
 import { API_SERVER_URL } from "../utilities/constants";
+import { setIsAudioOn, setIsVideoOn } from "../redux/action/deviceActions";
 
 const ConferencePage = (props) => {
-  const { userData } = props;
+  const { userData, deviceData, setVideo, setAudio } = props;
   const { roomId, secureRoom, username, password } = userData;
+  const { isAudioOn, isVideoOn, cameraID, microphoneID } = deviceData;
   const [peers, setPeers] = useState([]);
   const videoRef = useRef();
   const peersRef = useRef([]);
   const socketRef = useRef();
+
+  console.log("isAudioOn", isAudioOn);
+
+  const toggleVideo = () => {
+    setVideo(!isVideoOn);
+  };
+
+  const toggleAudio = () => {
+    setAudio(!isAudioOn);
+  };
 
   const createPeer = (userToSignal, callerID, stream) => {
     const peer = new SimplePeer({
@@ -43,6 +62,37 @@ const ConferencePage = (props) => {
 
     return peer;
   };
+
+  useEffect(() => {
+    const startVideoStream = async () => {
+      try {
+        const constraints = {
+          video: isVideoOn
+            ? {
+                deviceId: cameraID ? { exact: cameraID } : undefined,
+              }
+            : false,
+          audio: isAudioOn
+            ? {
+                deviceId: microphoneID ? { exact: microphoneID } : undefined,
+              }
+            : false,
+        };
+        const stream =
+          isVideoOn || isAudioOn
+            ? await navigator.mediaDevices.getUserMedia(constraints)
+            : null;
+        if (videoRef.current && cameraID) {
+          videoRef.current.srcObject = stream;
+        } else {
+          videoRef.current.srcObject = null;
+        }
+      } catch (error) {
+        console.error("Error starting video stream:", error);
+      }
+    };
+    startVideoStream();
+  }, [cameraID, microphoneID, isVideoOn, isAudioOn]);
 
   useEffect(() => {
     socketRef.current = io(API_SERVER_URL);
@@ -98,13 +148,36 @@ const ConferencePage = (props) => {
   return (
     <React.Fragment>
       <p>{roomId}</p>
-      <video
+      {/* <video
         className="video-stream-1"
         ref={videoRef}
         autoPlay
         playsInline
-        muted
+        muted={!isAudioOn}
+      ></video> */}
+      <video
+        ref={videoRef}
+        playsInline={true}
+        autoPlay={true}
+        className="mirror"
+        poster="../images/loader.gif"
       ></video>
+      <div className="toggle-buttons-container">
+        <a
+          className={`initbutton ${isVideoOn ? "active" : "inactive"}`}
+          onClick={toggleVideo}
+        >
+          <FontAwesomeIcon icon={isVideoOn ? faVideo : faVideoSlash} />
+        </a>
+        <a
+          className={`initbutton ${isAudioOn ? "active" : "inactive"}`}
+          onClick={toggleAudio}
+        >
+          <FontAwesomeIcon
+            icon={isAudioOn ? faMicrophone : faMicrophoneSlash}
+          />
+        </a>
+      </div>
       <div className="video-grid">
         {peers.map((peer, index) => {
           return <VideoTile index={index} key={index} peer={peer} />;
@@ -116,7 +189,8 @@ const ConferencePage = (props) => {
 
 const mapStateToProps = (state) => {
   const { roomId, username, secureRoom, joinLink } = state.login;
-  const { cameraID, microphoneID, speakerID } = state.devices;
+  const { cameraID, microphoneID, speakerID, isAudioOn, isVideoOn } =
+    state.devices;
   const { loading, orgName, orgLogo } = state.common;
   return {
     userData: {
@@ -129,6 +203,8 @@ const mapStateToProps = (state) => {
       cameraID,
       microphoneID,
       speakerID,
+      isAudioOn,
+      isVideoOn,
     },
     loading,
     orgLogo,
@@ -136,4 +212,11 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(ConferencePage);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setAudio: (isOn) => dispatch(setIsAudioOn(isOn)),
+    setVideo: (isOn) => dispatch(setIsVideoOn(isOn)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ConferencePage);

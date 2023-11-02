@@ -16,6 +16,8 @@ import {
   setSetupCompleted,
   setSpeaker,
   unsetSetupCompleted,
+  setIsAudioOn,
+  setIsVideoOn,
 } from "../redux/action/deviceActions";
 import { connect as reduxConnect } from "react-redux";
 const SetUp = (props) => {
@@ -26,11 +28,15 @@ const SetUp = (props) => {
     setCameraID,
     setMicrophoneID,
     setSpeakerID,
-    setSetupCompleted
+    setSetupCompleted,
+    isAudioOn,
+    isVideoOn,
+    setAudio,
+    setVideo,
   } = props;
 
-  const [isVideoOn, setIsVideoOn] = useState(true);
-  const [isAudioOn, setIsAudioOn] = useState(true);
+  // const [isVideoOn, setIsVideoOn] = useState(true);
+  // const [isAudioOn, setIsAudioOn] = useState(true);
   const [videoDevices, setVideoDevices] = useState([]);
   const [audioDevices, setAudioDevices] = useState([]);
   const [speakerDevices, setSpeakerDevices] = useState([]);
@@ -40,7 +46,7 @@ const SetUp = (props) => {
 
   const videoRef = useRef();
   const toggleVideo = () => {
-    setIsVideoOn((prev) => !prev);
+    setVideo(!isVideoOn);
     if (videoRef.current) {
       if (isVideoOn) {
         setCameraID(null);
@@ -56,8 +62,8 @@ const SetUp = (props) => {
   };
 
   const toggleAudio = () => {
-    setIsAudioOn((prev) => !prev);
-
+    console.log("toggle.!", isAudioOn);
+    setAudio(!isAudioOn);
     if (videoRef.current) {
       const audioTracks = videoRef.current.srcObject
         ? videoRef.current.srcObject.getAudioTracks()
@@ -205,7 +211,7 @@ const SetUp = (props) => {
                     {videoDeviceName}
                   </Dropdown.Toggle>
                   <Dropdown.Menu className="device-selection-dropdown-menu">
-                    {videoDevices.map((device,index) => (
+                    {videoDevices.map((device, index) => (
                       <Dropdown.Item
                         key={`vid_device_${index}`}
                         onChange={() => setCameraID(device.deviceId)}
@@ -230,7 +236,7 @@ const SetUp = (props) => {
                     {audioDeviceName}
                   </Dropdown.Toggle>
                   <Dropdown.Menu className="device-selection-dropdown-menu">
-                    {audioDevices.map((device,index) => (
+                    {audioDevices.map((device, index) => (
                       <Dropdown.Item
                         key={`aud_device_${index}`}
                         onChange={() => setMicrophoneID(device.deviceId)}
@@ -255,7 +261,7 @@ const SetUp = (props) => {
                     {speakerDeviceName}
                   </Dropdown.Toggle>
                   <Dropdown.Menu className="device-selection-dropdown-menu">
-                    {speakerDevices.map((device,index) => (
+                    {speakerDevices.map((device, index) => (
                       <Dropdown.Item
                         key={`spkr_device_${index}`}
                         onChange={() => setSpeakerID(device.deviceId)}
@@ -287,12 +293,21 @@ const SetUp = (props) => {
   );
 };
 const mapStateToProps = (state) => {
-  const { cameraID, microphoneID, speakerID, isSetupComplete } = state.devices;
+  const {
+    cameraID,
+    microphoneID,
+    speakerID,
+    isSetupComplete,
+    isAudioOn,
+    isVideoOn,
+  } = state.devices;
   return {
     cameraID,
     microphoneID,
     speakerID,
     isSetupComplete,
+    isAudioOn,
+    isVideoOn,
   };
 };
 
@@ -303,6 +318,8 @@ const mapDispatchToProps = (dispatch) => {
     setSpeakerID: (spID) => dispatch(setSpeaker(spID)),
     setSetupCompleted: () => dispatch(setSetupCompleted()),
     unsetSetupCompleted: () => dispatch(unsetSetupCompleted()),
+    setAudio: (isOn) => dispatch(setIsAudioOn(isOn)),
+    setVideo: (isOn) => dispatch(setIsVideoOn(isOn)),
   };
 };
 
