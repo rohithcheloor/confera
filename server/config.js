@@ -1,4 +1,6 @@
 'use strict';
+import { configDotenv } from "dotenv";
+configDotenv();
 const config =  {
     server: {
         listen: {
