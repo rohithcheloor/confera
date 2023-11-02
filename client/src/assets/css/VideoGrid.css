@@ -274,21 +274,27 @@ video:fullscreen {
   width: calc(100% - 100px);
 }
 
-.device-selection-dropdown-menu{
+.device-selection-dropdown-menu {
   width: calc(100% - 100px);
 }
 
-.join-room-btn{
+.join-room-btn {
   min-height: 80px;
   font-size: 26px;
-  font-family: 'Tilt Neon', sans-serif;
+  font-family: "Tilt Neon", sans-serif;
 }
 
-.setup-rightpane-container{
+.setup-rightpane-container {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.setup-rightpane-container .input-group button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 input[type="range"] {
@@ -310,8 +316,21 @@ input[type="range"] {
 }
 
 @media screen and (max-width: 600px) {
+  .row {
+    --bs-gutter-x: 0px;
+  }
   .username {
     font-size: 12px;
+  }
+  .setup-rightpane-container {
+    padding: 1em;
+  }
+  .setup-rightpane-container .input-group {
+    justify-content: center;
+  }
+  .dropdown-item-text {
+    overflow: auto;
+    text-overflow: ellipsis;
   }
 }
 @media screen and (max-width: 500px) {

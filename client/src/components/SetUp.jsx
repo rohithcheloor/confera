@@ -18,7 +18,7 @@ import {
   unsetSetupCompleted,
 } from "../redux/action/deviceActions";
 import { connect as reduxConnect } from "react-redux";
-const SetUp = (props) => {
+const Setup = (props) => {
   const {
     cameraID,
     microphoneID,
@@ -26,7 +26,7 @@ const SetUp = (props) => {
     setCameraID,
     setMicrophoneID,
     setSpeakerID,
-    setSetupCompleted
+    setSetupCompleted,
   } = props;
 
   const [isVideoOn, setIsVideoOn] = useState(true);
@@ -56,8 +56,10 @@ const SetUp = (props) => {
   };
 
   const toggleAudio = () => {
+    if (isAudioOn) {
+      setMicrophoneID(null);
+    }
     setIsAudioOn((prev) => !prev);
-
     if (videoRef.current) {
       const audioTracks = videoRef.current.srcObject
         ? videoRef.current.srcObject.getAudioTracks()
@@ -75,11 +77,14 @@ const SetUp = (props) => {
   useEffect(() => {
     const getMediaDevices = async () => {
       try {
+        await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices =
           devices && devices.filter((device) => device.kind === "videoinput");
         const audioDevices =
           devices && devices.filter((device) => device.kind === "audioinput");
+        const speakerDevices =
+          devices && devices.filter((device) => device.kind === "audiooutput");
         setVideoDevices(videoDevices);
         setAudioDevices(audioDevices);
         if (videoDevices && videoDevices.length > 0) {
@@ -90,16 +95,6 @@ const SetUp = (props) => {
           setAudioDeviceName(audioDevices[0]?.label || "No device selected");
           setMicrophoneID(audioDevices[0]?.deviceId || null);
         }
-      } catch (error) {
-        console.error("Error fetching media devices:", error);
-      }
-    };
-
-    const getSpeakers = async () => {
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const speakerDevices =
-          devices && devices.filter((device) => device.kind === "audiooutput");
         if (speakerDevices && speakerDevices.length > 0) {
           setSpeakerDeviceName(
             speakerDevices[0]?.label || "No device selected"
@@ -108,11 +103,10 @@ const SetUp = (props) => {
           setSpeakerDevices(speakerDevices);
         }
       } catch (error) {
-        console.error("Error fetching speaker devices:", error);
+        console.error("Error fetching media devices:", error);
       }
     };
     getMediaDevices();
-    getSpeakers();
   }, []);
 
   useEffect(() => {
@@ -159,10 +153,25 @@ const SetUp = (props) => {
     setSetupCompleted();
   };
 
+  const handleCameraChange = (id, name) => {
+    setCameraID(id);
+    setVideoDeviceName(name);
+  };
+
+  const handleMicChange = (id, name) => {
+    setMicrophoneID(id);
+    setAudioDeviceName(name);
+  };
+
+  const handleSpeakerChange = (id, name) => {
+    setSpeakerID(id);
+    setSpeakerDeviceName(name);
+  };
+
   return (
     <React.Fragment>
       <Row className="w-100">
-        <Col sm={12} md={6}>
+        <Col sm={12} md={6} style={{ paddingRight: 0 }}>
           <div className="video-container">
             <video
               ref={videoRef}
@@ -202,13 +211,17 @@ const SetUp = (props) => {
                     id="dropdown-basic"
                     className="device-selection-dropdown"
                   >
-                    {videoDeviceName}
+                    <span className="dropdown-item-text">
+                      {videoDeviceName}
+                    </span>
                   </Dropdown.Toggle>
                   <Dropdown.Menu className="device-selection-dropdown-menu">
-                    {videoDevices.map((device,index) => (
+                    {videoDevices.map((device, index) => (
                       <Dropdown.Item
                         key={`vid_device_${index}`}
-                        onChange={() => setCameraID(device.deviceId)}
+                        onClick={() =>
+                          handleCameraChange(device.deviceId, device.label)
+                        }
                       >
                         {device.label ||
                           `Camera ${device.deviceId.substring(0, 5)}`}
@@ -227,13 +240,17 @@ const SetUp = (props) => {
                     id="dropdown-basic"
                     className="device-selection-dropdown"
                   >
-                    {audioDeviceName}
+                    <span className="dropdown-item-text">
+                      {audioDeviceName}
+                    </span>
                   </Dropdown.Toggle>
                   <Dropdown.Menu className="device-selection-dropdown-menu">
-                    {audioDevices.map((device,index) => (
+                    {audioDevices.map((device, index) => (
                       <Dropdown.Item
                         key={`aud_device_${index}`}
-                        onChange={() => setMicrophoneID(device.deviceId)}
+                        onClick={() =>
+                          handleMicChange(device.deviceId, device.label)
+                        }
                       >
                         {device.label ||
                           `Microphone ${device.deviceId.substring(0, 5)}`}
@@ -252,13 +269,17 @@ const SetUp = (props) => {
                     id="dropdown-basic"
                     className="device-selection-dropdown"
                   >
-                    {speakerDeviceName}
+                    <span className="dropdown-item-text">
+                      {speakerDeviceName}
+                    </span>
                   </Dropdown.Toggle>
                   <Dropdown.Menu className="device-selection-dropdown-menu">
-                    {speakerDevices.map((device,index) => (
+                    {speakerDevices.map((device, index) => (
                       <Dropdown.Item
                         key={`spkr_device_${index}`}
-                        onChange={() => setSpeakerID(device.deviceId)}
+                        onClick={() =>
+                          handleSpeakerChange(device.deviceId, device.label)
+                        }
                       >
                         {device.label ||
                           `Speaker ${device.deviceId.substring(0, 5)}`}
@@ -306,4 +327,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default reduxConnect(mapStateToProps, mapDispatchToProps)(SetUp);
+export default reduxConnect(mapStateToProps, mapDispatchToProps)(Setup);
