@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap');
+body{
+    background: linear-gradient(45deg,#000000,#000154);
+    background-attachment: fixed;
+}
+h1{
+    font-family: 'Tilt Neon', sans-serif;
+    font-size: 50px;
+}
+.tab-content{
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    color: #ffffff;
+    background-color: #ffffff17;
+    padding-bottom: 1em;
+}
+.uname-container{
+    border-radius: 8px;
+    color: #ffffff;
+    background-color: #ffffff17;
+    padding: 1rem;
+}
+.nav-tabs{
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: #ffffff;
+    color: #ffffff;
+}
+.nav-tabs .nav-link:hover{
+    border-color: #000154;
+    border-radius: 0px;
+    background: linear-gradient(45deg,#000000,#000154) ;
+    color: #ffffff;
+}
+#room-tabs-tabpane-create,#room-tabs-tabpane-join{
+    padding: 1rem;
+}

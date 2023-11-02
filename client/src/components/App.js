@@ -1,9 +1,12 @@
-import LandingPage from "../pages/LandingPage";
+import React from "react";
+import Router from "../router";
+import InitialConfig from "./InitialConfig";
 
 function App() {
   return (
-    <div className="App">
-      <LandingPage />
+    <div>
+      <InitialConfig />
+      <Router />
     </div>
   );
 }
