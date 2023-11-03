@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Container, Row, Col, Form, Button, Tabs, Tab } from "react-bootstrap";
 import "../assets/css/login.css";
 import { api_post } from "../utilities/apiRequest";
-import { LoginUser } from "../redux/action/loginActions";
+import { LoginUser, setLoggedIn } from "../redux/action/loginActions";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -113,8 +113,8 @@ class Login extends Component {
       this.props.loginUser(
         createRoom.data.roomId,
         this.state.username,
-        this.state.enableSecureRoom,
-        null,
+        createRoom.data.isPrivateRoom,
+        createRoom.data.joinLink,
         true
       );
     } else {
@@ -144,7 +144,7 @@ class Login extends Component {
         this.state.roomId,
         this.state.username,
         this.state.enableSecureRoom,
-        null,
+        authenticateRoom.data.joinLink,
         true
       );
     } else {
@@ -162,6 +162,10 @@ class Login extends Component {
         });
       }
     }
+  };
+
+  handleJoinRoomWithLink = () => {
+    this.props.setUserLoggedIn();
   };
 
   sanitizeRoomIdInput = (roomId) => {
@@ -199,120 +203,144 @@ class Login extends Component {
             </Form>
           </Col>
         </Row>
-        <Row style={{ padding: "1em" }}>
-          <Tabs
-            id="room-tabs"
-            activeKey={this.state.tabState}
-            onSelect={(e) => this.setState({ tabState: e })}
-          >
-            <Tab eventKey="join" title="Join Room">
-              <Col>
-                <Form>
-                  <Form.Group controlId="roomIdJoin">
-                    <Form.Label>Room ID:</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="roomId"
-                      value={this.state.roomId}
-                      onChange={this.handleInputChange}
-                      maxLength="14"
-                      pattern="\d{4}-\d{4}-\d{4}"
-                      placeholder="1234-5678-9012"
-                    />
-                  </Form.Group>
+        {!this.props.isLoggedIn && this.props.joinLink && (
+          <Row>
+            <Button
+              onClick={() => this.handleJoinRoomWithLink()}
+              variant="primary"
+              className="mt-3"
+            >
+              Join Room
+            </Button>
+          </Row>
+        )}
+        {!this.props.isLoggedIn && !this.props.joinLink && (
+          <Row style={{ padding: "1em" }}>
+            <Tabs
+              id="room-tabs"
+              activeKey={this.state.tabState}
+              onSelect={(e) => this.setState({ tabState: e })}
+            >
+              <Tab eventKey="join" title="Join Room">
+                <Col>
+                  <Form>
+                    <Form.Group controlId="roomIdJoin">
+                      <Form.Label>Room ID:</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="roomId"
+                        value={this.state.roomId}
+                        onChange={this.handleInputChange}
+                        maxLength="14"
+                        pattern="\d{4}-\d{4}-\d{4}"
+                        placeholder="1234-5678-9012"
+                      />
+                    </Form.Group>
 
-                  <Form.Group controlId="passwordJoin">
-                    <Form.Label>Password:</Form.Label>
-                    <Form.Control
-                      type="password"
-                      name="password"
-                      value={this.state.password}
-                      onChange={this.handleInputChange}
-                      disabled={!this.state.enableSecureRoom}
-                    />
-                  </Form.Group>
+                    <Form.Group controlId="passwordJoin">
+                      <Form.Label>Password:</Form.Label>
+                      <Form.Control
+                        type="password"
+                        name="password"
+                        value={this.state.password}
+                        onChange={this.handleInputChange}
+                        disabled={!this.state.enableSecureRoom}
+                      />
+                    </Form.Group>
 
-                  <Form.Group
-                    controlId="enableSecureRoomJoin"
-                    style={{ paddingTop: "1em" }}
+                    <Form.Group
+                      controlId="enableSecureRoomJoin"
+                      style={{ paddingTop: "1em" }}
+                    >
+                      <Form.Check
+                        type="checkbox"
+                        label="Have a Password?"
+                        name="enableSecureRoom"
+                        checked={this.state.enableSecureRoom}
+                        onChange={this.handleInputChange}
+                      />
+                    </Form.Group>
+                  </Form>
+
+                  <Button
+                    onClick={() => this.handleJoinRoom()}
+                    variant="primary"
+                    className="mt-3"
+                    disabled={this.state.roomId.length !== 14}
                   >
-                    <Form.Check
-                      type="checkbox"
-                      label="Have a Password?"
-                      name="enableSecureRoom"
-                      checked={this.state.enableSecureRoom}
-                      onChange={this.handleInputChange}
-                    />
-                  </Form.Group>
-                </Form>
+                    Join Room
+                  </Button>
+                </Col>
+              </Tab>
+              <Tab eventKey="create" title="Create Room">
+                <Col>
+                  <Form>
+                    <Form.Group controlId="roomId">
+                      <Form.Label>Room ID:</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="roomId"
+                        value={this.state.roomId}
+                        disabled
+                      />
+                    </Form.Group>
 
-                <Button
-                  onClick={() => this.handleJoinRoom()}
-                  variant="primary"
-                  className="mt-3"
-                  disabled={this.state.roomId.length !== 14}
-                >
-                  Join Room
-                </Button>
-              </Col>
-            </Tab>
-            <Tab eventKey="create" title="Create Room">
-              <Col>
-                <Form>
-                  <Form.Group controlId="roomId">
-                    <Form.Label>Room ID:</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="roomId"
-                      value={this.state.roomId}
-                      disabled
-                    />
-                  </Form.Group>
+                    <Form.Group controlId="password">
+                      <Form.Label>Password:</Form.Label>
+                      <Form.Control
+                        type="password"
+                        name="password"
+                        value={this.state.password}
+                        onChange={this.handleInputChange}
+                        disabled={!this.state.enableSecureRoom}
+                      />
+                    </Form.Group>
 
-                  <Form.Group controlId="password">
-                    <Form.Label>Password:</Form.Label>
-                    <Form.Control
-                      type="password"
-                      name="password"
-                      value={this.state.password}
-                      onChange={this.handleInputChange}
-                      disabled={!this.state.enableSecureRoom}
-                    />
-                  </Form.Group>
+                    <Form.Group
+                      controlId="enableSecureRoom"
+                      style={{ paddingTop: "1em" }}
+                    >
+                      <Form.Check
+                        type="checkbox"
+                        label="Enable Secure Room"
+                        name="enableSecureRoom"
+                        checked={this.state.enableSecureRoom}
+                        onChange={this.handleInputChange}
+                      />
+                    </Form.Group>
+                  </Form>
 
-                  <Form.Group
-                    controlId="enableSecureRoom"
-                    style={{ paddingTop: "1em" }}
+                  <Button
+                    onClick={() => this.handleCreateRoom()}
+                    variant="primary"
+                    className="mt-3"
                   >
-                    <Form.Check
-                      type="checkbox"
-                      label="Enable Secure Room"
-                      name="enableSecureRoom"
-                      checked={this.state.enableSecureRoom}
-                      onChange={this.handleInputChange}
-                    />
-                  </Form.Group>
-                </Form>
-
-                <Button
-                  onClick={() => this.handleCreateRoom()}
-                  variant="primary"
-                  className="mt-3"
-                >
-                  Create Room
-                </Button>
-              </Col>
-            </Tab>
-          </Tabs>
-        </Row>
+                    Create Room
+                  </Button>
+                </Col>
+              </Tab>
+            </Tabs>
+          </Row>
+        )}
       </Container>
     );
   }
 }
+const mapStateToProps = (state) => {
+  const { roomId, username, secureRoom, joinLink, isLoggedIn } = state.login;
+  return {
+    roomId,
+    username,
+    secureRoom,
+    joinLink,
+    isLoggedIn,
+  };
+};
 const mapDispatchToProps = (dispatch) => {
   return {
     loginUser: (roomId, username, secureRoom, joinLink, isLoggedIn) =>
       dispatch(LoginUser(roomId, username, secureRoom, joinLink, isLoggedIn)),
+    setUserLoggedIn: () => dispatch(setLoggedIn()),
   };
 };
-export default connect(null, mapDispatchToProps)(Login);
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
