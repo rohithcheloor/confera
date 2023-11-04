@@ -79,9 +79,7 @@ io.on("connection", (socket) => {
     } else {
       const roomPrefix = secureRoom ? `${room.roomId}-SEC` : room.roomId;
 
-      const userActiveSocket = activeSockets
-        .filter((user) => user.id === socket.id)
-        ?.at(0);
+      const userActiveSocket = activeSockets.filter((user) => user.id === socket.id)?.at(0);
       if (userActiveSocket && userActiveSocket.joined === false) {
         socket.join(roomPrefix);
         console.log(`User Joined ${roomPrefix}`);
