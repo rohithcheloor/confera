@@ -16,7 +16,7 @@ import {
 } from "./store/roomStore.js";
 import { Server as socketIO } from "socket.io";
 import { createRoom, createRoomId } from "./api/createRoom.js";
-import { authenticateRoom } from "./api/joinRoom.js";
+import { authenticateRoom, authenticateRoomByLink } from "./api/joinRoom.js";
 import config from "./config.js";
 import { configDotenv } from "dotenv";
 
@@ -55,6 +55,7 @@ app.get("/", (req, res) => res.end("Confera API is running..."));
 app.post("/api/generate-room-id", createRoomId);
 app.post("/api/create-room", createRoom);
 app.post("/api/room/authenticate", authenticateRoom);
+app.post("/api/join-with-link",authenticateRoomByLink)
 
 io.on("connection", (socket) => {
   console.log("New User : " + socket.id);
