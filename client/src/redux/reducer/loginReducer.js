@@ -17,7 +17,7 @@ const LoginReducer = (state = initState, { type, payload = {} }) => {
         username: payload.username,
         secureRoom: payload.secureRoom,
         joinLink: payload.joinLink,
-        isLoggedIn: true,
+        isLoggedIn: payload.isLoggedIn,
       };
     case LOGIN.LOGOUT_USER:
       return initState;
@@ -27,6 +27,8 @@ const LoginReducer = (state = initState, { type, payload = {} }) => {
       return state.username;
     case LOGIN.GET_JOIN_LINK:
       return state.joinLink;
+    case LOGIN.SET_LOGGED_IN:
+      return { ...state, isLoggedIn: true };
     default:
       return state;
   }
