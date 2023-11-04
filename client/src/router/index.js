@@ -3,16 +3,22 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import SetUpPage from "../pages/SetUpPage";
 import Login from "../components/Login";
 import ConferencePage from "../pages/Conference";
+import JoinLink from "../pages/JoinLink";
 
 const Router = (props) => {
-  const {isLoggedIn,isSetupComplete} = props;
+  const { isLoggedIn, isSetupComplete } = props;
   return (
     <BrowserRouter>
       <Routes>
         {!isLoggedIn && <Route path="/" element={<Login />}></Route>}
-        {isLoggedIn && !isSetupComplete && <Route path="/" element={<SetUpPage />}></Route>}
-        {isLoggedIn && isSetupComplete && <Route path="/" element={<ConferencePage/>}></Route>}
+        {isLoggedIn && !isSetupComplete && (
+          <Route path="/" element={<SetUpPage />}></Route>
+        )}
+        {isLoggedIn && isSetupComplete && (
+          <Route path="/" element={<ConferencePage />}></Route>
+        )}
         <Route path="/setup" element={<SetUpPage />}></Route>
+        <Route path="/join-with-link/:id" element={<JoinLink />}></Route>
       </Routes>
     </BrowserRouter>
   );
