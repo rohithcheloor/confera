@@ -40,10 +40,11 @@
     bottom: 0;
     margin: 10px;
 }
-.buttons .btnMain{
-    width: 50px;
-    height: 40px;
-}
+
 .font-icon{
     font-size: 24px;
+}
+.conf-control-buttons button{
+    min-width: 80px;
+    padding: 1em;
 }
