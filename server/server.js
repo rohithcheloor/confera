@@ -4,10 +4,7 @@
 import express from "express";
 import cors from "cors";
 import compression from "compression";
-import httpolyglot from "httpolyglot";
-import { readFileSync } from "fs";
-import { fileURLToPath } from "url";
-import { join, dirname } from "path";
+import http from "http";
 import {
   addPrivateRoomParticipants,
   addPublicRoomParticipants,
@@ -17,21 +14,18 @@ import {
 import { Server as socketIO } from "socket.io";
 import { createRoom, createRoomId } from "./api/createRoom.js";
 import { authenticateRoom, authenticateRoomByLink } from "./api/joinRoom.js";
-import config from "./config.js";
 import { configDotenv } from "dotenv";
+import config from "./config.js";
 
 const app = express();
 configDotenv();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
-const options = {
-  cert: readFileSync(join(__dirname, config.server.ssl.cert), "utf-8"),
-  key: readFileSync(join(__dirname, config.server.ssl.key), "utf-8"),
-  passphrase: "confera",
-};
+app.use(cors({ origin: "http://localhost:3000/" }));
+app.use(compression());
+app.use(express.json());
+app.use(express.static("public"));
 
-const server = httpolyglot.createServer(options, app);
+const server = http.createServer(app);
 const io = new socketIO(server, {
   transports: ["websocket", "polling", "flashsocket"],
   cors: {
@@ -39,13 +33,7 @@ const io = new socketIO(server, {
     credentials: true,
   },
 });
-
 const activeSockets = [];
-
-app.use(cors({ origin: "http://localhost:3000/" }));
-app.use(compression());
-app.use(express.json());
-app.use(express.static("public"));
 
 server.listen(config.server.listen.port, () => {
   console.log("App Started at PORT:" + config.server.listen.port);
@@ -55,7 +43,7 @@ app.get("/", (req, res) => res.end("Confera API is running..."));
 app.post("/api/generate-room-id", createRoomId);
 app.post("/api/create-room", createRoom);
 app.post("/api/room/authenticate", authenticateRoom);
-app.post("/api/join-with-link",authenticateRoomByLink)
+app.post("/api/join-with-link", authenticateRoomByLink);
 
 io.on("connection", (socket) => {
   console.log("New User : " + socket.id);
