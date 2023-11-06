@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 
 const RoomDetailsMenu = (props) => {
   const { userData, isPopupOpen, setIsPopOpen } = props;
-  const { roomId, joinlink } = userData;
+  const { roomId, joinLink } = userData;
 
   return (
     <div className="room-details-menu" style={{ background: "white" }}>
@@ -27,7 +27,9 @@ const RoomDetailsMenu = (props) => {
             </tr>
             <tr>
               <td>Join link: </td>
-              <td>{!joinlink ? "Unavailable" : joinlink}</td>
+              <td>
+                {!joinLink ? "Unavailable" : <a target="_blank" href={joinLink}>{joinLink}</a>}
+              </td>
             </tr>
           </table>
         </Popup>
@@ -36,11 +38,11 @@ const RoomDetailsMenu = (props) => {
   );
 };
 const mapStateToProps = (state) => {
-  const { roomId, joinlink } = state.login;
+  const { roomId, joinLink } = state.login;
   return {
     userData: {
       roomId,
-      joinlink,
+      joinLink,
     },
   };
 };

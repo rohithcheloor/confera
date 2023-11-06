@@ -222,7 +222,7 @@ const ConferencePage = (props) => {
           })}
         <p>{roomId}</p>
       </div>
-      <div className="buttons">
+      <div className="conf-control-buttons-container">
         <ButtonGroup className="conf-control-buttons">
           <Button variant="success">
             <FontAwesomeIcon icon={faVideo} className="font-icon" />
