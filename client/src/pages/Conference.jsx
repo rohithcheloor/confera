@@ -235,11 +235,7 @@ const ConferencePage = (props) => {
           </Button>
         </ButtonGroup>
       </div>
-      <Popup
-        open={isPopupOpen}
-        closeOnDocumentClick
-        onClose={() => setIsPopOpen(false)}
-      >
+      <Popup open={isPopupOpen} onClose={() => setIsPopOpen(false)}>
         <RoomDetailsMenu
           userData={userData}
           isPopupOpen={isPopupOpen}
