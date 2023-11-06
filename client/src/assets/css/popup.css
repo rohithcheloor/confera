@@ -1,3 +1,21 @@
+.room-details{
+    border: none;
+    font-size: 25px;
+    border-collapse: separate;
+    border-spacing: 10px;
+}
+.room-details td{
+    padding: 5px;
+}
+.copy-message{
+    display: flex;
+    justify-content: center;
+    font-size: 15px;
+    background-color:rgb(2, 62, 27);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
 .room-details-menu{
     background-color: #000000;
     color: #ffffff;
@@ -6,4 +24,61 @@
 
 .room-details-menu button{
     float: right;
+}
+
+.Heading{
+    display: flex;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: bold;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+@media screen and (max-width: 960px) {
+
+.room-details-menu{
+    margin: -190px 0;
+    font-size: 22px;
+}
+.room-details{
+    font-size: 18px;
+}
+.room-details td{
+    display: flex;
+    flex-direction: column;
+    padding: 3px;
+}
+
+}
+
+@media screen and (max-width: 600px) {
+
+.room-details-menu{
+    margin: -220px 20px;
+    font-size: 20px;
+}
+.room-details{
+    font-size: 12px;
+}
+.room-details td{
+    display: flex;
+    flex-direction: column;
+    padding: 2px;
+}
+
+.room-details-menu button{
+    font-size: 13px;
+}
+
+.copy-message{
+    font-size: 12px;
+}
+
+.Heading{
+    font-size: 18px;
+    padding: 0px;
+    padding-top: 10px;
+}
+
 }
