@@ -8,7 +8,7 @@ export const LoginUser = (
   isLoggedIn
 ) => {
   if (joinLink && joinLink.toString().trim() !== "") {
-    joinLink = window.location.host + "/join-with-link/" + joinLink;
+    joinLink = window.location.origin + "/join-with-link/" + joinLink;
   }
   const payload = { roomId, username, secureRoom, joinLink, isLoggedIn };
   console.log(payload);
