@@ -10,6 +10,7 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      orglogo: null,
       orgName: null,
       roomId: "",
       password: "",
@@ -19,21 +20,27 @@ class Login extends Component {
       tabState: "join",
     };
   }
-
   componentDidMount() {
+    let orglogo = process.env.REACT_APP_COMPANY_LOGO;
     let orgName = process.env.REACT_APP_COMPANY_NAME;
     if (this.state.orgName === null) {
       if (
-        String(orgName) !== "" &&
+        String(orgName).trim() !== "" &&
         String(orgName).toLowerCase().trim() !== "confera"
       ) {
         orgName = "Confera for " + orgName;
+      } else {
+        if (!orgName || String(orgName).trim() === "") {
+          orgName = "Confera";
+        }
       }
-      this.setState({ orgName: String(orgName).toUpperCase() });
-    } else {
-      if (!orgName) {
-        orgName = "Confera";
+      if (!orglogo || String(orglogo).trim() === "") {
+        orglogo = null;
       }
+      this.setState({
+        orgName: String(orgName).toUpperCase(),
+        orglogo: orglogo,
+      });
     }
   }
 
@@ -177,13 +184,23 @@ class Login extends Component {
     formattedInput = formattedInput.slice(0, -1);
     return formattedInput;
   };
-
   render() {
     return (
       <Container
         className="d-grid align-items-center justify-content-center"
         style={{ height: "100vh" }}
       >
+        {this.state.orglogo && (
+          <Row>
+            <div className="company-logo-container">
+              <img
+                src={this.state.orglogo}
+                alt="Company Logo"
+                className="company-logo"
+              />
+            </div>
+          </Row>
+        )}
         <Row>
           <h1 className="text-center text-white">{this.state.orgName}</h1>
         </Row>

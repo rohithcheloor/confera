@@ -35,3 +35,16 @@
     color: white;
     border: none;
 }
+.buttons{
+    position: absolute;
+    bottom: 0;
+    margin: 10px;
+}
+
+.font-icon{
+    font-size: 24px;
+}
+.conf-control-buttons button{
+    min-width: 80px;
+    padding: 1em;
+}

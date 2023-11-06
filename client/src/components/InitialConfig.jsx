@@ -24,6 +24,18 @@ const InitialConfig = (props) => {
     }
     document.title = orgName;
     unsetLoading();
+  }, [orgName]);
+  useEffect(() => {
+    const companyLogo = process.env.REACT_APP_COMPANY_LOGO;
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.getElementsByTagName("head")[0].appendChild(link);
+    }
+    if (companyLogo && String(companyLogo).trim() !== "") {
+      link.href = companyLogo;
+    }
   }, []);
   return (
     <React.Fragment>
