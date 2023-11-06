@@ -1,0 +1,9 @@
+.room-details-menu{
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 10px;
+}
+
+.room-details-menu button{
+    float: right;
+}
