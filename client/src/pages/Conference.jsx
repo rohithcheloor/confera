@@ -1,10 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
+import Popup from "reactjs-popup";
 import io from "socket.io-client";
 import SimplePeer from "simple-peer";
 import "../assets/css/video.css";
 import VideoTile from "../components/Video";
 import { connect } from "react-redux";
 import { API_SERVER_URL } from "../utilities/constants";
+import RoomDetailsMenu from "../components/RoomDetails";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button, ButtonGroup } from "react-bootstrap";
+import {
+  faVideo,
+  faVideoSlash,
+  faMicrophone,
+  faInfo,
+  faMicrophoneSlash,
+  faCamera,
+  faVolumeHigh,
+} from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 
 const ConferencePage = (props) => {
@@ -28,6 +41,11 @@ const ConferencePage = (props) => {
     } else {
       return false;
     }
+  };
+
+  const [isPopupOpen, setIsPopOpen] = useState(false);
+  const openPopup = () => {
+    setIsPopOpen(true);
   };
 
   useEffect(() => {
@@ -198,11 +216,36 @@ const ConferencePage = (props) => {
       ></video>
       <div className="video-grid">
         {console.log("Updated Peers", peers)}
-        {peers.length > 0 && peers.map((peerItem, index) => {
-          return <VideoTile index={index} key={index} peer={peerItem} />;
-        })}
+        {peers.length > 0 &&
+          peers.map((peerItem, index) => {
+            return <VideoTile index={index} key={index} peer={peerItem} />;
+          })}
         <p>{roomId}</p>
       </div>
+      <div className="buttons">
+        <ButtonGroup className="conf-control-buttons">
+          <Button variant="success">
+            <FontAwesomeIcon icon={faVideo} className="font-icon" />
+          </Button>
+          <Button variant="success">
+            <FontAwesomeIcon icon={faMicrophone} className="font-icon" />
+          </Button>
+          <Button variant="success" onClick={openPopup}>
+            <FontAwesomeIcon icon={faInfo} className="font-icon" />
+          </Button>
+        </ButtonGroup>
+      </div>
+      <Popup
+        open={isPopupOpen}
+        closeOnDocumentClick
+        onClose={() => setIsPopOpen(false)}
+      >
+        <RoomDetailsMenu
+          userData={userData}
+          isPopupOpen={isPopupOpen}
+          setIsPopOpen={setIsPopOpen}
+        />
+      </Popup>
     </React.Fragment>
   );
 };
