@@ -81,7 +81,7 @@
   .video-grid{
     padding: 0px;
     overflow: auto;
-    max-height: calc(100vh - 60px - 150px);
+    max-height: calc(100vh - 60px);
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
 }

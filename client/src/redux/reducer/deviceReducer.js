@@ -5,6 +5,8 @@ const initState = {
   microphoneID: null,
   speakerID: null,
   isSetupComplete: false,
+  isCameraOn: true,
+  isMicOn: true,
 };
 
 const DeviceReducer = (state = initState, { type, payload = {} }) => {
@@ -33,6 +35,10 @@ const DeviceReducer = (state = initState, { type, payload = {} }) => {
       return { ...state, speakerID: payload.speakerID };
     case DEVICE.SET_SETUP_COMPLETED:
       return { ...state, isSetupComplete: true };
+    case DEVICE.TOGGLE_CAMERA_ON:
+      return { ...state, isCameraOn: !state.isCameraOn };
+    case DEVICE.TOGGLE_MIC_ON:
+      return { ...state, isMicOn: !state.isMicOn };
     case DEVICE.UNSET_SETUP_COMPLETED:
       return { ...initState, isSetupComplete: false };
     default:

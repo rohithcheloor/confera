@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import {
   setLoading,
+  setMobileDevice,
   setOrgLogo,
   setOrgName,
   unsetLoading,
@@ -9,8 +10,22 @@ import {
 import "../assets/css/loading.css";
 
 const InitialConfig = (props) => {
-  const { loading, setLoading, unsetLoading, orgName, setOrgName } = props;
+  const {
+    loading,
+    setLoading,
+    unsetLoading,
+    orgName,
+    setOrgName,
+    setMobileDevice,
+  } = props;
   useEffect(() => {
+    if (
+      /Mobi|Android|iPhone|iPad|Windows Phone|Mobile|Silk|GT-(I|N7|N8|N7P)|SC-02C|SC-03D|SC-05D|SH|SCH|SGH|SPH|SGH-(I|N7|T|T779)|SM-(G|N9|T|N9|P|T|N900|N9005)|SPH-L|SGH-I|LG-(E|MS|P|R|US|AS|V|VS|LS|SU|C|L|K)|DROID|Razr|XOOM/i.test(
+        navigator.userAgent
+      )
+    ) {
+      setMobileDevice();
+    }
     setLoading();
     let myOrgName = process.env.REACT_APP_COMPANY_NAME;
     if (
@@ -67,6 +82,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    setMobileDevice: () => dispatch(setMobileDevice()),
     setLoading: () => dispatch(setLoading()),
     unsetLoading: () => dispatch(unsetLoading()),
     setOrgName: (orgName) => dispatch(setOrgName(orgName)),

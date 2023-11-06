@@ -17,20 +17,38 @@ import {
   faMicrophoneSlash,
   faCamera,
   faVolumeHigh,
+  faUserSlash,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
+import { toggleCamera, toggleMicrophone } from "../redux/action/deviceActions";
 
 const ConferencePage = (props) => {
-  const { userData, deviceData } = props;
-  const { cameraID, microphoneID } = deviceData;
+  const { userData, deviceData, toggleCamera, toggleMicrophone } = props;
+  const { cameraID, microphoneID, isCameraOn, isMicOn } = deviceData;
   const { roomId, secureRoom, username, password } = userData;
 
   const [peers, setPeers] = useState([]);
   const [myStream, setMyStream] = useState(null);
+  const [myView, setMyView] = useState(true);
 
   const videoRef = useRef();
   const peersRef = useRef([]);
   const socketRef = useRef();
+
+  const handleCamera = () => {
+    toggleCamera();
+  };
+
+  const handleMicrophone = () => {
+    toggleMicrophone();
+  };
+
+  const handleMyView = () => {
+    console.log(videoRef.current);
+    videoRef.current.style.setProperty('display', myView ? 'none' : '');
+    setMyView(!myView);
+  };
 
   const validateExistingPeer = (peerID) => {
     if (
@@ -51,26 +69,34 @@ const ConferencePage = (props) => {
   useEffect(() => {
     socketRef.current = io(API_SERVER_URL);
     const constraints = {
-      video: cameraID
-        ? {
-            deviceId: { exact: cameraID },
-          }
-        : false,
-      audio: microphoneID
-        ? {
-            deviceId: { exact: microphoneID },
-          }
-        : false,
+      video: {
+        deviceId: { exact: cameraID },
+      },
+      audio: {
+        deviceId: { exact: microphoneID },
+      },
     };
     const connectLocalVideo = async () => {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const audioTracks = stream.getAudioTracks();
+      const videoTracks = stream.getVideoTracks();
+      if (videoTracks) {
+        videoTracks.forEach((track) => {
+          track.enabled = isCameraOn;
+        });
+      }
+      if (audioTracks) {
+        audioTracks.forEach((track) => {
+          track.enabled = isMicOn;
+        });
+      }
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
       setMyStream(stream);
     };
     connectLocalVideo();
-  }, [cameraID, microphoneID]);
+  }, [cameraID, microphoneID, isCameraOn, isMicOn]);
 
   useEffect(() => {
     const joinRoom = async () => {
@@ -224,14 +250,34 @@ const ConferencePage = (props) => {
       </div>
       <div className="conf-control-buttons-container">
         <ButtonGroup className="conf-control-buttons">
-          <Button variant="success">
-            <FontAwesomeIcon icon={faVideo} className="font-icon" />
+          <Button
+            variant="success"
+            onClick={handleCamera}
+            className={`initbutton ${isCameraOn ? "active" : "inactive"}`}
+          >
+            <FontAwesomeIcon
+              icon={isCameraOn ? faVideoSlash : faVideo}
+              className="font-icon"
+            />
           </Button>
-          <Button variant="success">
-            <FontAwesomeIcon icon={faMicrophone} className="font-icon" />
+          <Button
+            variant="success"
+            onClick={handleMicrophone}
+            className={`initbutton ${isMicOn ? "active" : "inactive"}`}
+          >
+            <FontAwesomeIcon
+              icon={isMicOn ? faMicrophoneSlash : faMicrophone}
+              className="font-icon"
+            />
           </Button>
           <Button variant="success" onClick={openPopup}>
             <FontAwesomeIcon icon={faInfo} className="font-icon" />
+          </Button>
+          <Button variant="success" onClick={handleMyView}>
+            <FontAwesomeIcon
+              icon={myView ? faUserSlash : faUser}
+              className="font-icon"
+            />
           </Button>
         </ButtonGroup>
       </div>
@@ -248,7 +294,8 @@ const ConferencePage = (props) => {
 
 const mapStateToProps = (state) => {
   const { roomId, username, secureRoom, joinLink } = state.login;
-  const { cameraID, microphoneID, speakerID } = state.devices;
+  const { cameraID, microphoneID, speakerID, isCameraOn, isMicOn } =
+    state.devices;
   const { loading, orgName, orgLogo } = state.common;
   return {
     userData: {
@@ -261,6 +308,8 @@ const mapStateToProps = (state) => {
       cameraID,
       microphoneID,
       speakerID,
+      isCameraOn,
+      isMicOn,
     },
     loading,
     orgLogo,
@@ -268,4 +317,11 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(ConferencePage);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    toggleCamera: () => dispatch(toggleCamera()),
+    toggleMicrophone: () => dispatch(toggleMicrophone()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ConferencePage);
