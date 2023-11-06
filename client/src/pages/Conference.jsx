@@ -17,6 +17,8 @@ import {
   faMicrophoneSlash,
   faCamera,
   faVolumeHigh,
+  faUserSlash,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import { toggleCamera, toggleMicrophone } from "../redux/action/deviceActions";
@@ -28,6 +30,7 @@ const ConferencePage = (props) => {
 
   const [peers, setPeers] = useState([]);
   const [myStream, setMyStream] = useState(null);
+  const [myView, setMyView] = useState(true);
 
   const videoRef = useRef();
   const peersRef = useRef([]);
@@ -39,6 +42,12 @@ const ConferencePage = (props) => {
 
   const handleMicrophone = () => {
     toggleMicrophone();
+  };
+
+  const handleMyView = () => {
+    console.log(videoRef.current);
+    videoRef.current.style.setProperty('display', myView ? 'none' : '');
+    setMyView(!myView);
   };
 
   const validateExistingPeer = (peerID) => {
@@ -241,14 +250,34 @@ const ConferencePage = (props) => {
       </div>
       <div className="conf-control-buttons-container">
         <ButtonGroup className="conf-control-buttons">
-          <Button variant="success">
-            <FontAwesomeIcon icon={faVideo} className="font-icon" />
+          <Button
+            variant="success"
+            onClick={handleCamera}
+            className={`initbutton ${isCameraOn ? "active" : "inactive"}`}
+          >
+            <FontAwesomeIcon
+              icon={isCameraOn ? faVideoSlash : faVideo}
+              className="font-icon"
+            />
           </Button>
-          <Button variant="success">
-            <FontAwesomeIcon icon={faMicrophone} className="font-icon" />
+          <Button
+            variant="success"
+            onClick={handleMicrophone}
+            className={`initbutton ${isMicOn ? "active" : "inactive"}`}
+          >
+            <FontAwesomeIcon
+              icon={isMicOn ? faMicrophoneSlash : faMicrophone}
+              className="font-icon"
+            />
           </Button>
           <Button variant="success" onClick={openPopup}>
             <FontAwesomeIcon icon={faInfo} className="font-icon" />
+          </Button>
+          <Button variant="success" onClick={handleMyView}>
+            <FontAwesomeIcon
+              icon={myView ? faUserSlash : faUser}
+              className="font-icon"
+            />
           </Button>
         </ButtonGroup>
       </div>
