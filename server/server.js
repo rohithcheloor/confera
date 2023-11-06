@@ -4,10 +4,6 @@
 import express from "express";
 import cors from "cors";
 import compression from "compression";
-import httpolyglot from "httpolyglot";
-import { readFileSync } from "fs";
-import { fileURLToPath } from "url";
-import { join, dirname } from "path";
 import {
   addPrivateRoomParticipants,
   addPublicRoomParticipants,
@@ -22,20 +18,7 @@ import { configDotenv } from "dotenv";
 
 const app = express();
 configDotenv();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
-const options = {
-  cert: readFileSync(join(__dirname, config.server.ssl.cert), "utf-8"),
-  key: readFileSync(join(__dirname, config.server.ssl.key), "utf-8"),
-  passphrase: "confera",
-};
-
-const server = httpolyglot.createServer(options, app);
-const io = new socketIO(server, {
-  transports: ["websocket", "polling", "flashsocket"],
-  cors: config.server.cors,
-});
 
 const activeSockets = [];
 
@@ -44,9 +27,15 @@ app.use(compression());
 app.use(express.json());
 app.use(express.static("public"));
 
-server.listen(config.server.listen.port, () => {
+const server = app.listen(config.server.listen.port, () => {
   console.log("App Started at PORT:" + config.server.listen.port);
 });
+
+const io = new socketIO(server, {
+  transports: ["websocket", "polling", "flashsocket"],
+  cors: config.server.cors,
+});
+
 
 app.get("/", (req, res) => res.end("Confera API is running..."));
 app.post("/api/generate-room-id", createRoomId);
