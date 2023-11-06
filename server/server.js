@@ -34,15 +34,12 @@ const options = {
 const server = httpolyglot.createServer(options, app);
 const io = new socketIO(server, {
   transports: ["websocket", "polling", "flashsocket"],
-  cors: {
-    origin: "http://localhost:3000",
-    credentials: true,
-  },
+  cors: config.server.cors,
 });
 
 const activeSockets = [];
 
-app.use(cors({ origin: "http://localhost:3000/" }));
+app.use(cors(config.server.cors));
 app.use(compression());
 app.use(express.json());
 app.use(express.static("public"));
@@ -55,7 +52,7 @@ app.get("/", (req, res) => res.end("Confera API is running..."));
 app.post("/api/generate-room-id", createRoomId);
 app.post("/api/create-room", createRoom);
 app.post("/api/room/authenticate", authenticateRoom);
-app.post("/api/join-with-link",authenticateRoomByLink)
+app.post("/api/join-with-link", authenticateRoomByLink);
 
 io.on("connection", (socket) => {
   console.log("New User : " + socket.id);
