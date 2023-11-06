@@ -1,15 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import Popup from "reactjs-popup";
-import "../../src/assets/css/roomDetails.css";
 import { connect } from "react-redux";
 import { Button } from "react-bootstrap";
 import "../assets/css/popup.css";
 const RoomDetailsMenu = (props) => {
   const { userData, isPopupOpen, setIsPopOpen } = props;
   const { roomId, joinLink } = userData;
+  const [copiedMessage, setCopiedMessage] = useState("");
+
+  const copyLink = () => {
+    if (joinLink) {
+      navigator.clipboard.writeText(joinLink).then(() => {
+        setCopiedMessage("Link copied to clipboard");
+        setTimeout(() => {
+          setCopiedMessage("");
+        }, 1500);
+      });
+    }
+  };
+  const showCopyMessage = () => {
+    setCopiedMessage("Click to copy");
+  };
+  const hideCopyMessage = () => {
+    setCopiedMessage("");
+  };
 
   return (
     <div className="room-details-menu">
+      <div className="Heading">Room Information</div>
       <table className="room-details">
         <tr>
           <td>Room id: </td>
@@ -21,11 +39,17 @@ const RoomDetailsMenu = (props) => {
             {!joinLink ? (
               "Unavailable"
             ) : (
-              <a target="_blank" href={joinLink}>
-                {joinLink}
-              </a>
+              <div title="Click to copy">
+                <a onClick={copyLink} style={{ cursor: "pointer" }}>
+                  {joinLink}
+                </a>
+              </div>
             )}
           </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
         </tr>
         <tr>
           <td colSpan={2}>
@@ -39,6 +63,7 @@ const RoomDetailsMenu = (props) => {
           </td>
         </tr>
       </table>
+      {copiedMessage && <p className="copy-message">{copiedMessage}</p>}
     </div>
   );
 };
