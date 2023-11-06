@@ -4,6 +4,7 @@ const initState = {
   loading: false,
   orgName: "",
   orgLogo: "",
+  isMobile: false,
 };
 
 const CommonReducer = (state = initState, { type, payload = {} }) => {
@@ -22,6 +23,8 @@ const CommonReducer = (state = initState, { type, payload = {} }) => {
       return { ...state, orgName: payload.orgName };
     case COMMON.SET_ORG_LOGO:
       return { ...state, orgLogo: payload.orgLogo };
+      case COMMON.SET_MOBILE:
+        return {...state, isMobile: true}
     default:
       return state;
   }

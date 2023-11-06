@@ -40,3 +40,11 @@ export const getSpeaker = () => {
 export const getDevices = () => {
   return { type: DEVICE.GET_DEVICES };
 };
+
+export const toggleCamera = () => {
+  return { type: DEVICE.TOGGLE_CAMERA_ON };
+};
+
+export const toggleMicrophone = () => {
+  return { type: DEVICE.TOGGLE_MIC_ON };
+};

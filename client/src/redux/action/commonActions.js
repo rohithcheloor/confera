@@ -14,3 +14,7 @@ export const setOrgLogo = (orgLogo) => {
   const payload = { orgLogo };
   return { type: COMMON.SET_ORG_LOGO, payload };
 };
+
+export const setMobileDevice = () => {
+  return { type: COMMON.SET_MOBILE };
+};
