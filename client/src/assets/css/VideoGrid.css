@@ -304,6 +304,15 @@ input[type="range"] {
   cursor: pointer;
 }
 
+.roombutton.inactive {
+  background-color: var(--bs-red);
+  border: 2px solid var(--bs-red);
+}
+
+.roombutton:hover {
+  border-bottom: 2px solid #fff;
+}
+
 @keyframes show {
   0% {
     opacity: 0;

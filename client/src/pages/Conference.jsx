@@ -8,7 +8,7 @@ import { connect } from "react-redux";
 import { API_SERVER_URL } from "../utilities/constants";
 import RoomDetailsMenu from "../components/RoomDetails";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, ButtonGroup } from "react-bootstrap";
+import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
 import {
   faVideo,
   faVideoSlash,
@@ -19,6 +19,7 @@ import {
   faVolumeHigh,
   faUserSlash,
   faUser,
+  faArrowRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import { toggleCamera, toggleMicrophone } from "../redux/action/deviceActions";
@@ -44,9 +45,13 @@ const ConferencePage = (props) => {
     toggleMicrophone();
   };
 
+  const handleLogout = () => {
+    window.location.reload();
+  };
+
   const handleMyView = () => {
     console.log(videoRef.current);
-    videoRef.current.style.setProperty('display', myView ? 'none' : '');
+    videoRef.current.style.setProperty("display", myView ? "none" : "");
     setMyView(!myView);
   };
 
@@ -95,7 +100,25 @@ const ConferencePage = (props) => {
       }
       setMyStream(stream);
     };
-    connectLocalVideo();
+    if (!myStream) {
+      connectLocalVideo();
+    } else {
+      const audioTracks = myStream.getAudioTracks();
+      const videoTracks = myStream.getVideoTracks();
+      if (videoTracks) {
+        videoTracks.forEach((track) => {
+          track.enabled = isCameraOn;
+        });
+      }
+      if (audioTracks) {
+        audioTracks.forEach((track) => {
+          track.enabled = isMicOn;
+        });
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = myStream;
+      }
+    }
   }, [cameraID, microphoneID, isCameraOn, isMicOn]);
 
   useEffect(() => {
@@ -241,7 +264,6 @@ const ConferencePage = (props) => {
         muted
       ></video>
       <div className="video-grid">
-        {console.log("Updated Peers", peers)}
         {peers.length > 0 &&
           peers.map((peerItem, index) => {
             return <VideoTile index={index} key={index} peer={peerItem} />;
@@ -250,35 +272,65 @@ const ConferencePage = (props) => {
       </div>
       <div className="conf-control-buttons-container">
         <ButtonGroup className="conf-control-buttons">
-          <Button
-            variant="success"
-            onClick={handleCamera}
-            className={`initbutton ${isCameraOn ? "active" : "inactive"}`}
+          <OverlayTrigger
+            overlay={
+              <Tooltip>Turn {isCameraOn ? "off" : "on"} Video</Tooltip>
+            }
           >
-            <FontAwesomeIcon
-              icon={isCameraOn ? faVideoSlash : faVideo}
-              className="font-icon"
-            />
-          </Button>
-          <Button
-            variant="success"
-            onClick={handleMicrophone}
-            className={`initbutton ${isMicOn ? "active" : "inactive"}`}
+            <Button
+              variant={isCameraOn ? "success" : "danger"}
+              onClick={handleCamera}
+              className={`roombutton`}
+            >
+              <FontAwesomeIcon
+                icon={isCameraOn ? faVideo : faVideoSlash}
+                className="font-icon"
+              />
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger
+            overlay={<Tooltip>Turn {isMicOn ? "off" : "on"} Mic </Tooltip>}
           >
-            <FontAwesomeIcon
-              icon={isMicOn ? faMicrophoneSlash : faMicrophone}
-              className="font-icon"
-            />
-          </Button>
-          <Button variant="success" onClick={openPopup}>
-            <FontAwesomeIcon icon={faInfo} className="font-icon" />
-          </Button>
-          <Button variant="success" onClick={handleMyView}>
-            <FontAwesomeIcon
-              icon={myView ? faUserSlash : faUser}
-              className="font-icon"
-            />
-          </Button>
+            <Button
+              variant={isMicOn ? "success" : "danger"}
+              onClick={handleMicrophone}
+              className={`roombutton`}
+            >
+              <FontAwesomeIcon
+                icon={isMicOn ? faMicrophone : faMicrophoneSlash}
+                className="font-icon"
+              />
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger overlay={<Tooltip>Show Room Information</Tooltip>}>
+            <Button variant="success" className={`roombutton`} onClick={openPopup}>
+              <FontAwesomeIcon icon={faInfo} className="font-icon" />
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger
+            overlay={
+              <Tooltip>{myView ? "Hide" : "Show"} my Camera View</Tooltip>
+            }
+          >
+            <Button variant="success" className={`roombutton`} onClick={handleMyView}>
+              <FontAwesomeIcon
+                icon={myView ? faUserSlash : faUser}
+                className="font-icon"
+              />
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger
+            overlay={
+              <Tooltip>Exit Room</Tooltip>
+            }
+          >
+            <Button variant="danger" className={`roombutton`} onClick={handleLogout}>
+              <FontAwesomeIcon
+                icon={faArrowRightFromBracket}
+                className="font-icon"
+              />
+            </Button>
+          </OverlayTrigger>
         </ButtonGroup>
       </div>
       <Popup open={isPopupOpen} onClose={() => setIsPopOpen(false)}>
