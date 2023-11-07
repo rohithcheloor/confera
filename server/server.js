@@ -19,7 +19,6 @@ import { configDotenv } from "dotenv";
 const app = express();
 configDotenv();
 
-
 const activeSockets = [];
 
 app.use(cors(config.server.cors));
@@ -35,7 +34,6 @@ const io = new socketIO(server, {
   transports: ["websocket", "polling", "flashsocket"],
   cors: config.server.cors,
 });
-
 
 app.get("/", (req, res) => res.end("Confera API is running..."));
 app.post("/api/generate-room-id", createRoomId);
@@ -77,9 +75,10 @@ io.on("connection", (socket) => {
     } else {
       const roomPrefix = secureRoom ? `${room.roomId}-SEC` : room.roomId;
 
-      const userActiveSocket = activeSockets
-        .filter((user) => user.id === socket.id)
-        ?.at(0);
+      const userActiveSocket = activeSockets.filter(
+        (user) => user.id === socket.id
+      )[0];
+      // ?.at(0);
       if (userActiveSocket && userActiveSocket.joined === false) {
         socket.join(roomPrefix);
         console.log(`User Joined ${roomPrefix}`);
