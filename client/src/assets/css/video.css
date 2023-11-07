@@ -1,6 +1,6 @@
 .video-stream-1 {
   border-radius: 8px;
-  position: absolute;
+  position: fixed;
   z-index: 10;
   bottom: 10px;
   right: 10px;
@@ -19,7 +19,6 @@
 .video-stream-2 {
   margin: auto;
   width: 100%;
-  max-width: 50vw;
   border-radius: 4px;
   height: 100%;
   transform: rotateY(180deg);
@@ -36,7 +35,7 @@
   border: none;
 }
 .conf-control-buttons-container {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   margin: 10px;
 }
@@ -49,6 +48,20 @@
   padding: 1em;
   z-index: 10;
 }
+.video-tile-container {
+  background-color: #000000;
+  position: relative;
+}
+.peer-name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  color: #ffffff;
+  padding: 10px;
+  background-color: #0000002d;
+}
 @media screen and (max-width: 600px) {
   .conf-control-buttons-container {
     display: flex;
@@ -57,16 +70,16 @@
     width: 100%;
     margin: 0;
   }
-  .conf-control-buttons{
+  .conf-control-buttons {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
   }
-  .conf-control-buttons button{
+  .conf-control-buttons button {
     width: 100%;
   }
-  .video-stream-1{
+  .video-stream-1 {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -78,10 +91,13 @@
     right: auto;
     bottom: 60px;
   }
-  .video-grid{
+  .video-grid {
     padding: 0px;
     overflow: auto;
     max-height: calc(100vh - 60px);
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  .peer-name {
+    padding: 0px 4px;
   }
 }

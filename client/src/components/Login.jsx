@@ -155,7 +155,6 @@ class Login extends Component {
         true
       );
     } else {
-      console.log(authenticateRoom);
       if (authenticateRoom.data && authenticateRoom.data.message) {
         toast.error(authenticateRoom.data.message, {
           position: "bottom-right",
@@ -172,7 +171,13 @@ class Login extends Component {
   };
 
   handleJoinRoomWithLink = () => {
-    this.props.setUserLoggedIn();
+    this.props.loginUser(
+      this.props.roomId,
+      this.state.username,
+      this.props.enableSecureRoom,
+      this.props.joinLink,
+      true
+    );
   };
 
   sanitizeRoomIdInput = (roomId) => {

@@ -23,6 +23,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import { toggleCamera, toggleMicrophone } from "../redux/action/deviceActions";
+import { createPosterImage } from "../utilities/imageMaker";
 
 const ConferencePage = (props) => {
   const { userData, deviceData, toggleCamera, toggleMicrophone } = props;
@@ -32,6 +33,7 @@ const ConferencePage = (props) => {
   const [peers, setPeers] = useState([]);
   const [myStream, setMyStream] = useState(null);
   const [myView, setMyView] = useState(true);
+  const [myPosterImage, setMyPosterImage] = useState(null);
 
   const videoRef = useRef();
   const peersRef = useRef([]);
@@ -50,7 +52,6 @@ const ConferencePage = (props) => {
   };
 
   const handleMyView = () => {
-    console.log(videoRef.current);
     videoRef.current.style.setProperty("display", myView ? "none" : "");
     setMyView(!myView);
   };
@@ -63,6 +64,19 @@ const ConferencePage = (props) => {
       return true;
     } else {
       return false;
+    }
+  };
+
+  const getPeerName = (peerId) => {
+    if (peersRef.current) {
+      const peerDetails = peersRef.current.filter(
+        (peer) => peer.peerID === peerId
+      );
+      if (peerDetails.length > 0) {
+        return peerDetails[0].peerName;
+      } else {
+        return null;
+      }
     }
   };
 
@@ -136,7 +150,6 @@ const ConferencePage = (props) => {
 
   useEffect(() => {
     const createPeer = (userToSignal, callerID, isInitiator) => {
-      console.log("Creating Peer");
       if (myStream) {
         const peer = new SimplePeer({
           initiator: isInitiator,
@@ -149,6 +162,7 @@ const ConferencePage = (props) => {
               userToSignal,
               callerID,
               signal,
+              username,
             });
           });
         } else {
@@ -165,17 +179,18 @@ const ConferencePage = (props) => {
 
     const addPeers = async (myPeers, isInitiator) => {
       const users = [...peers];
-      myPeers.forEach(async (peerId) => {
-        if (peerId !== socketRef.current.id) {
-          if (!validateExistingPeer(peerId)) {
+      myPeers.forEach(async (peerDetails) => {
+        if (peerDetails.id !== socketRef.current.id) {
+          if (!validateExistingPeer(peerDetails.id)) {
             const newPeer = createPeer(
-              peerId,
+              peerDetails.id,
               socketRef.current.id,
               isInitiator
             );
             const peerData = {
-              peerID: peerId,
+              peerID: peerDetails.id,
               peer: newPeer,
+              peerName: peerDetails.name,
             };
             peersRef.current.push(peerData);
             users.push(newPeer);
@@ -183,53 +198,54 @@ const ConferencePage = (props) => {
         }
       });
       if (peersRef && peersRef.current) {
+        peersRef.current.filter((i) => i);
         const myPeersList = peersRef.current.map((item) => {
           if (item.peer) {
             item.peer.peerID = item.peerID;
           }
           return item.peer;
         });
-        console.log(myPeersList);
         setPeers(myPeersList);
       }
     };
     if (myStream && socketRef.current) {
       socketRef.current.on("get-peers", (myPeers) => {
-        console.log("GET PEERS");
         addPeers(myPeers, true);
       });
 
-      socketRef.current.on("user-connected", ({ signal, callerID }) => {
-        if (!validateExistingPeer(callerID)) {
-          const newPeer = createPeer(signal, callerID, false);
-          peersRef.current.push({
-            peerID: callerID,
-            peer: newPeer,
-          });
-          if (peersRef && peersRef.current) {
-            const myPeersList = peersRef.current.map((item) => {
-              if (item.peer) {
-                item.peer.peerID = item.peerID;
-              }
-              return item.peer;
+      socketRef.current.on(
+        "user-connected",
+        ({ signal, callerID, peerName }) => {
+          if (!validateExistingPeer(callerID)) {
+            const newPeer = createPeer(signal, callerID, false);
+            peersRef.current.push({
+              peerID: callerID,
+              peer: newPeer,
+              peerName,
             });
-            console.log(myPeersList);
-            setPeers(myPeersList);
+            if (peersRef && peersRef.current) {
+              const myPeersList = peersRef.current.map((item) => {
+                if (item.peer) {
+                  item.peer.peerID = item.peerID;
+                }
+                return item.peer;
+              });
+              setPeers(myPeersList);
+            }
           }
         }
-      });
+      );
 
       socketRef.current.on("answer", (payload) => {
         const item = peersRef.current.find(
-          (peer) => peer.peerID === payload.callerID
+          (peer) => peer && peer.peerID === payload.callerID
         );
         item.peer.signal(payload.signal);
       });
 
       socketRef.current.on("user-disconnected", (peerData) => {
         const { peerId, peerName } = peerData;
-        toast(`${peerName} Disconnected`);
-        console.log("Peers List", peersRef.current);
+        toast(`${peerName} Disconnected`, { theme: "dark", autoClose: 2000 });
         if (peersRef.current) {
           const newPeersList = [];
           peersRef.current.forEach((item, index) => {
@@ -241,7 +257,7 @@ const ConferencePage = (props) => {
               disconnectedPeer.destroy();
             }
           });
-          console.log(newPeersList);
+          peersRef.current = peersRef.current.filter((item) => item);
           setPeers(newPeersList);
         }
       });
@@ -254,6 +270,16 @@ const ConferencePage = (props) => {
     }
   }, [myStream]);
 
+  useEffect(() => {
+    if (!myPosterImage) {
+      const myPosterImage =
+        String(username).trim().length === 0
+          ? createPosterImage("U", 200, 140)
+          : createPosterImage(username, 200, 140);
+      setMyPosterImage(myPosterImage);
+    }
+  }, [myPosterImage]);
+
   return (
     <React.Fragment>
       <video
@@ -262,20 +288,26 @@ const ConferencePage = (props) => {
         autoPlay
         playsInline
         muted
+        poster={myPosterImage}
       ></video>
       <div className="video-grid">
         {peers.length > 0 &&
           peers.map((peerItem, index) => {
-            return <VideoTile index={index} key={index} peer={peerItem} />;
+            return (
+              <VideoTile
+                index={index}
+                key={index}
+                peer={peerItem}
+                peerName={getPeerName(peerItem.peerID)}
+              />
+            );
           })}
         <p>{roomId}</p>
       </div>
       <div className="conf-control-buttons-container">
         <ButtonGroup className="conf-control-buttons">
           <OverlayTrigger
-            overlay={
-              <Tooltip>Turn {isCameraOn ? "off" : "on"} Video</Tooltip>
-            }
+            overlay={<Tooltip>Turn {isCameraOn ? "off" : "on"} Video</Tooltip>}
           >
             <Button
               variant={isCameraOn ? "success" : "danger"}
@@ -303,7 +335,11 @@ const ConferencePage = (props) => {
             </Button>
           </OverlayTrigger>
           <OverlayTrigger overlay={<Tooltip>Show Room Information</Tooltip>}>
-            <Button variant="success" className={`roombutton`} onClick={openPopup}>
+          <Button
+              variant="success"
+              className={`roombutton`}
+              onClick={openPopup}
+            >
               <FontAwesomeIcon icon={faInfo} className="font-icon" />
             </Button>
           </OverlayTrigger>
@@ -312,19 +348,23 @@ const ConferencePage = (props) => {
               <Tooltip>{myView ? "Hide" : "Show"} my Camera View</Tooltip>
             }
           >
-            <Button variant="success" className={`roombutton`} onClick={handleMyView}>
+            <Button
+              variant="success"
+              className={`roombutton`}
+              onClick={handleMyView}
+            >
               <FontAwesomeIcon
                 icon={myView ? faUserSlash : faUser}
                 className="font-icon"
               />
             </Button>
           </OverlayTrigger>
-          <OverlayTrigger
-            overlay={
-              <Tooltip>Exit Room</Tooltip>
-            }
-          >
-            <Button variant="danger" className={`roombutton`} onClick={handleLogout}>
+          <OverlayTrigger overlay={<Tooltip>Exit Room</Tooltip>}>
+            <Button
+              variant="danger"
+              className={`roombutton`}
+              onClick={handleLogout}
+            >
               <FontAwesomeIcon
                 icon={faArrowRightFromBracket}
                 className="font-icon"
