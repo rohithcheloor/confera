@@ -149,66 +149,66 @@ const ConferencePage = (props) => {
   }, [roomId, username, password, secureRoom]);
 
   useEffect(() => {
-    if (myStream) {
-      const createPeer = (userToSignal, callerID, isInitiator) => {
-        if (myStream) {
-          const peer = new SimplePeer({
-            initiator: isInitiator,
-            trickle: false,
-            stream: myStream,
-          });
-          if (isInitiator) {
-            peer.on("signal", async (signal) => {
-              await socketRef.current.emit("offer", {
-                userToSignal,
-                callerID,
-                signal,
-                username,
-              });
-            });
-          } else {
-            peer.on("signal", async (signal) => {
-              await socketRef.current.emit("accept", { signal, callerID });
-            });
-            if (!validateExistingPeer(userToSignal)) {
-              peer.signal(userToSignal);
-            }
-          }
-          return peer;
-        }
-      };
-
-      const addPeers = async (myPeers, isInitiator) => {
-        const users = [...peers];
-        myPeers.forEach(async (peer) => {
-          if (peer.id !== socketRef.current.id) {
-            if (!validateExistingPeer(peer.id)) {
-              const newPeer = createPeer(
-                peer.id,
-                socketRef.current.id,
-                isInitiator
-              );
-              const peerData = {
-                peerID: peer.id,
-                peer: newPeer,
-                peerName: peer.name,
-              };
-              peersRef.current.push(peerData);
-              users.push(newPeer);
-            }
-          }
+    const createPeer = (userToSignal, callerID, isInitiator) => {
+      if (myStream) {
+        const peer = new SimplePeer({
+          initiator: isInitiator,
+          trickle: false,
+          stream: myStream,
         });
-        if (peersRef && peersRef.current) {
-          const myPeersList = peersRef.current.map((item) => {
-            if (item.peer) {
-              item.peer.peerID = item.peerID;
-            }
-            return item.peer;
+        if (isInitiator) {
+          peer.on("signal", async (signal) => {
+            await socketRef.current.emit("offer", {
+              userToSignal,
+              callerID,
+              signal,
+              username,
+            });
           });
-          setPeers(myPeersList);
+        } else {
+          peer.on("signal", async (signal) => {
+            await socketRef.current.emit("accept", { signal, callerID });
+          });
+          if (!validateExistingPeer(userToSignal)) {
+            peer.signal(userToSignal);
+          }
         }
-      };
-      
+        return peer;
+      }
+    };
+
+    const addPeers = async (myPeers, isInitiator) => {
+      const users = [...peers];
+      myPeers.forEach(async (peerDetails) => {
+        if (peerDetails.id !== socketRef.current.id) {
+          if (!validateExistingPeer(peerDetails.id)) {
+            const newPeer = createPeer(
+              peerDetails.id,
+              socketRef.current.id,
+              isInitiator
+            );
+            const peerData = {
+              peerID: peerDetails.id,
+              peer: newPeer,
+              peerName: peerDetails.name,
+            };
+            peersRef.current.push(peerData);
+            users.push(newPeer);
+          }
+        }
+      });
+      if (peersRef && peersRef.current) {
+        peersRef.current.filter((i) => i);
+        const myPeersList = peersRef.current.map((item) => {
+          if (item.peer) {
+            item.peer.peerID = item.peerID;
+          }
+          return item.peer;
+        });
+        setPeers(myPeersList);
+      }
+    };
+    if (myStream && socketRef.current) {
       socketRef.current.on("get-peers", (myPeers) => {
         addPeers(myPeers, true);
       });
@@ -238,9 +238,9 @@ const ConferencePage = (props) => {
 
       socketRef.current.on("answer", (payload) => {
         const item = peersRef.current.find(
-          (peer) => peer.peerID === payload.callerID
+          (peer) => peer && peer.peerID === payload.callerID
         );
-        item.peer.signal(payload.signal)
+        item.peer.signal(payload.signal);
       });
 
       socketRef.current.on("user-disconnected", (peerData) => {
@@ -257,14 +257,15 @@ const ConferencePage = (props) => {
               disconnectedPeer.destroy();
             }
           });
+          peersRef.current = peersRef.current.filter((item) => item);
           setPeers(newPeersList);
         }
       });
 
       return () => {
-        // socketRef.current.off("get-peers");
-        // socketRef.current.off("user-connected");
-        // socketRef.current.off("answer");
+        socketRef.current.off("get-peers");
+        socketRef.current.off("user-connected");
+        socketRef.current.off("answer");
       };
     }
   }, [myStream]);
@@ -292,25 +293,16 @@ const ConferencePage = (props) => {
       <div className="video-grid">
         {peers.length > 0 &&
           peers.map((peerItem, index) => {
-            const peerName = getPeerName(peerItem.peerID);
-            const videoPoster = peerName
-              ? createPosterImage(
-                  String(peerName).slice(0, 2).toUpperCase(),
-                  200,
-                  140
-                )
-              : createPosterImage("U", 200, 140);
             return (
               <VideoTile
                 index={index}
                 key={index}
                 peer={peerItem}
-                peerName={peerName}
-                videoPoster={videoPoster}
+                peerName={getPeerName(peerItem.peerID)}
               />
             );
           })}
-        {/* <p>{roomId}</p> */}
+        <p>{roomId}</p>
       </div>
       <div className="conf-control-buttons-container">
         <ButtonGroup className="conf-control-buttons">
@@ -343,7 +335,7 @@ const ConferencePage = (props) => {
             </Button>
           </OverlayTrigger>
           <OverlayTrigger overlay={<Tooltip>Show Room Information</Tooltip>}>
-            <Button
+          <Button
               variant="success"
               className={`roombutton`}
               onClick={openPopup}
