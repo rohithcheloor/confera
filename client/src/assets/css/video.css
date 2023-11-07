@@ -1,6 +1,6 @@
 .video-stream-1 {
   border-radius: 8px;
-  position: absolute;
+  position: fixed;
   z-index: 10;
   bottom: 10px;
   right: 10px;
@@ -36,7 +36,7 @@
   border: none;
 }
 .conf-control-buttons-container {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   margin: 10px;
 }
@@ -49,6 +49,12 @@
   padding: 1em;
   z-index: 10;
 }
+.video-tile-container {
+  background-color: #000000;
+}
+.peer-name {
+  color: #ffffff;
+}
 @media screen and (max-width: 600px) {
   .conf-control-buttons-container {
     display: flex;
@@ -57,16 +63,16 @@
     width: 100%;
     margin: 0;
   }
-  .conf-control-buttons{
+  .conf-control-buttons {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
   }
-  .conf-control-buttons button{
+  .conf-control-buttons button {
     width: 100%;
   }
-  .video-stream-1{
+  .video-stream-1 {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -78,7 +84,7 @@
     right: auto;
     bottom: 60px;
   }
-  .video-grid{
+  .video-grid {
     padding: 0px;
     overflow: auto;
     max-height: calc(100vh - 60px);

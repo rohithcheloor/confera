@@ -172,7 +172,13 @@ class Login extends Component {
   };
 
   handleJoinRoomWithLink = () => {
-    this.props.setUserLoggedIn();
+    this.props.loginUser(
+      this.props.roomId,
+      this.state.username,
+      this.props.enableSecureRoom,
+      this.props.joinLink,
+      true
+    );
   };
 
   sanitizeRoomIdInput = (roomId) => {
