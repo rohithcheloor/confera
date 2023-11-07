@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import { api_post } from "../utilities/apiRequest";
 
 const JoinLink = (props) => {
-  console.log(props);
   const { joinLink } = props;
   const { id } = useParams();
   useEffect(() => {
@@ -23,7 +22,6 @@ const JoinLink = (props) => {
           false
         );
       } else {
-        console.log(authenticateRoom);
         if (authenticateRoom.data && authenticateRoom.data.message) {
           toast.error(authenticateRoom.data.message, {
             position: "bottom-right",

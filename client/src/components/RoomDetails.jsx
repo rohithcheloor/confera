@@ -29,39 +29,41 @@ const RoomDetailsMenu = (props) => {
     <div className="room-details-menu">
       <div className="Heading">Room Information</div>
       <table className="room-details">
-        <tr>
-          <td>Room id: </td>
-          <td>{roomId}</td>
-        </tr>
-        <tr>
-          <td>Join link: </td>
-          <td>
-            {!joinLink ? (
-              "Unavailable"
-            ) : (
-              <div title="Click to copy">
-                <a onClick={copyLink} style={{ cursor: "pointer" }}>
-                  {joinLink}
-                </a>
-              </div>
-            )}
-          </td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td colSpan={2}>
-            <Button
-              className="float-right"
-              variant="danger"
-              onClick={() => setIsPopOpen(false)}
-            >
-              Close
-            </Button>
-          </td>
-        </tr>
+        <tbody>
+          <tr>
+            <td>Room id: </td>
+            <td>{roomId}</td>
+          </tr>
+          <tr>
+            <td>Join link: </td>
+            <td>
+              {!joinLink ? (
+                "Unavailable"
+              ) : (
+                <div title="Click to copy">
+                  <a onClick={copyLink} style={{ cursor: "pointer" }}>
+                    {joinLink}
+                  </a>
+                </div>
+              )}
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td colSpan={2}>
+              <Button
+                className="float-right"
+                variant="danger"
+                onClick={() => setIsPopOpen(false)}
+              >
+                Close
+              </Button>
+            </td>
+          </tr>
+        </tbody>
       </table>
       {copiedMessage && <p className="copy-message">{copiedMessage}</p>}
     </div>

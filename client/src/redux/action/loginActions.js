@@ -11,7 +11,6 @@ export const LoginUser = (
     joinLink = window.location.origin + "/join-with-link/" + joinLink;
   }
   const payload = { roomId, username, secureRoom, joinLink, isLoggedIn };
-  console.log(payload);
   return { type: LOGIN.LOGIN_USER, payload };
 };
 export const LogoutUser = () => {
