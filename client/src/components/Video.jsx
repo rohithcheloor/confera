@@ -4,9 +4,7 @@ const VideoTile = (props) => {
   const { peer, index, peerName, videoPoster } = props;
   const ref = useRef();
   useEffect(() => {
-    console.log(peer);
     peer.on("stream", (stream) => {
-        console.log(stream);
       if (ref.current) ref.current.srcObject = stream;
     });
   }, [peer]);

@@ -155,7 +155,6 @@ class Login extends Component {
         true
       );
     } else {
-      console.log(authenticateRoom);
       if (authenticateRoom.data && authenticateRoom.data.message) {
         toast.error(authenticateRoom.data.message, {
           position: "bottom-right",
