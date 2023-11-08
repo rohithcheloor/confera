@@ -20,7 +20,9 @@
   margin: auto;
   width: 100%;
   border-radius: 4px;
-  height: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
   transform: rotateY(180deg);
 }
 .room-input input {
@@ -51,6 +53,8 @@
 .video-tile-container {
   background-color: #000000;
   position: relative;
+  display: flex;
+  justify-content: center;
 }
 .peer-name {
   position: absolute;
