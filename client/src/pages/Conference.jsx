@@ -57,7 +57,9 @@ const ConferencePage = (props) => {
   const validateExistingPeer = (peerID) => {
     if (
       peersRef.current &&
-      peersRef.current.filter((peer) => peer.peerID === peerID).length > 0
+      peersRef.current.filter(
+        (peer) => peer.peerID === peerID || peer.peerID === socketRef.current.id
+      ).length > 0
     ) {
       return true;
     } else {
@@ -151,7 +153,7 @@ const ConferencePage = (props) => {
       if (myStream) {
         const peer = new SimplePeer({
           initiator: isInitiator,
-          trickle: false,
+          trickle: true,
           stream: myStream,
         });
         if (isInitiator) {
@@ -170,7 +172,7 @@ const ConferencePage = (props) => {
           if (!validateExistingPeer(userToSignal)) {
             peer.signal(userToSignal);
           }
-          peer.on("close",() => {
+          peer.on("end", () => {
             console.log("Peer Closed");
             peer.destroy();
           });
@@ -241,11 +243,11 @@ const ConferencePage = (props) => {
         }
       );
 
-      socketRef.current.on("answer", (payload) => {
+      socketRef.current.on("answer", async (payload) => {
         const item = peersRef.current.find(
           (peer) => peer && peer.peerID === payload.callerID
         );
-        item.peer.signal(payload.signal);
+        await item.peer.signal(payload.signal);
       });
 
       socketRef.current.on("update-peers", (newPeersList = []) => {
@@ -264,12 +266,18 @@ const ConferencePage = (props) => {
       socketRef.current.on("user-disconnected", (peerData) => {
         const { peerId, peerName } = peerData;
         toast(`${peerName} Disconnected`, { theme: "dark", autoClose: 2000 });
-        const peerIndex =peersRef.current.findIndex((item) => item.peerID === peerId);
+        const peerIndex = peersRef.current && peersRef.current.findIndex(
+          (item) => item.peerID === peerId
+        );
         const disconnectedPeer = peersRef.current.filter(
           (item) => item.peerID === peerId
         )[0];
-        disconnectedPeer.peer.destroy();
-        delete peersRef.current[peerIndex];
+        if(disconnectedPeer){
+          disconnectedPeer.peer.destroy();
+        }
+        if(peersRef.current && peerIndex){
+          delete peersRef.current[peerIndex];
+        }
       });
 
       return () => {
