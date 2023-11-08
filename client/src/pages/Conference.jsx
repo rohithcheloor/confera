@@ -15,8 +15,6 @@ import {
   faMicrophone,
   faInfo,
   faMicrophoneSlash,
-  faCamera,
-  faVolumeHigh,
   faUserSlash,
   faUser,
   faArrowRightFromBracket,
@@ -172,7 +170,14 @@ const ConferencePage = (props) => {
           if (!validateExistingPeer(userToSignal)) {
             peer.signal(userToSignal);
           }
+          peer.on("close",() => {
+            console.log("Peer Closed");
+            peer.destroy();
+          });
         }
+        peer.on("error", (err) => {
+          toast.error(err.message);
+        });
         return peer;
       }
     };
@@ -243,23 +248,28 @@ const ConferencePage = (props) => {
         item.peer.signal(payload.signal);
       });
 
+      socketRef.current.on("update-peers", (newPeersList = []) => {
+        const updatedPeersList = [];
+        peersRef.current.forEach((item) => {
+          if (
+            newPeersList.includes(item.peerID) &&
+            item.peerID !== socketRef.current.id
+          ) {
+            updatedPeersList.push(item.peer);
+          }
+        });
+        setPeers(updatedPeersList);
+      });
+
       socketRef.current.on("user-disconnected", (peerData) => {
         const { peerId, peerName } = peerData;
         toast(`${peerName} Disconnected`, { theme: "dark", autoClose: 2000 });
-        if (peersRef.current) {
-          const newPeersList = [];
-          peersRef.current.forEach((item, index) => {
-            if (item.peerID !== peerId) {
-              newPeersList.push(item.peer);
-            } else {
-              const disconnectedPeer = peersRef.current[index].peer;
-              delete peersRef.current[index];
-              disconnectedPeer.destroy();
-            }
-          });
-          peersRef.current = peersRef.current.filter((item) => item);
-          setPeers(newPeersList);
-        }
+        const peerIndex =peersRef.current.findIndex((item) => item.peerID === peerId);
+        const disconnectedPeer = peersRef.current.filter(
+          (item) => item.peerID === peerId
+        )[0];
+        disconnectedPeer.peer.destroy();
+        delete peersRef.current[peerIndex];
       });
 
       return () => {
@@ -302,7 +312,6 @@ const ConferencePage = (props) => {
               />
             );
           })}
-        <p>{roomId}</p>
       </div>
       <div className="conf-control-buttons-container">
         <ButtonGroup className="conf-control-buttons">
@@ -335,7 +344,7 @@ const ConferencePage = (props) => {
             </Button>
           </OverlayTrigger>
           <OverlayTrigger overlay={<Tooltip>Show Room Information</Tooltip>}>
-          <Button
+            <Button
               variant="success"
               className={`roombutton`}
               onClick={openPopup}
