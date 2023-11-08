@@ -24,6 +24,7 @@
   max-height: 80vh;
   object-fit: contain;
   transform: rotateY(180deg);
+  padding:10px;
 }
 .room-input input {
   margin: 1em;
