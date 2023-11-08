@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import { toast } from "react-toastify";
 import { createPosterImage } from "../utilities/imageMaker";
 
 const VideoTile = (props) => {
@@ -16,15 +15,10 @@ const VideoTile = (props) => {
 
   useEffect(() => {
     peer.on("stream", (stream) => {
-      toast.success("Stream Started");
       if (ref.current) ref.current.srcObject = stream;
     });
   }, [peer]);
-  useEffect(() => {
-    peer.on("close", () => {
-      toast.error("Stream Closed");
-    });
-  });
+
   return (
     <div className="video-tile-container">
       <video
