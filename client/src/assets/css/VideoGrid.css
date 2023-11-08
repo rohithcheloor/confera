@@ -313,6 +313,10 @@ input[type="range"] {
   border-bottom: 2px solid #fff;
 }
 
+.roombutton-dropdown {
+  min-width: 0 !important;
+}
+
 @keyframes show {
   0% {
     opacity: 0;
