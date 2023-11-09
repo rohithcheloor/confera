@@ -23,6 +23,7 @@ import {
   faMicrophoneSlash,
   faCamera,
   faVolumeHigh,
+  faDesktop,
   faUserSlash,
   faUser,
   faArrowRightFromBracket,
@@ -48,6 +49,7 @@ const ConferencePage = (props) => {
   const [myStream, setMyStream] = useState(null);
   const [myView, setMyView] = useState(true);
   const [myPosterImage, setMyPosterImage] = useState(null);
+  const [screenShareStream, setScreenShareStream] = useState(null);
 
   const [videoDevices, setVideoDevices] = useState([]);
   const [audioDevices, setAudioDevices] = useState([]);
@@ -90,6 +92,60 @@ const ConferencePage = (props) => {
   const handleSpeakerChange = (id, name) => {
     setSpeakerID(id);
     setSpeakerDeviceName(name);
+  };
+
+  const handleScreenShare = async () => {
+    try {
+      if (screenShareStream) {
+        // If screen sharing is already active, stop it
+        screenShareStream.getTracks().forEach((track) => track.stop());
+        setScreenShareStream(null);
+
+        // Remove screen share peer from peersRef
+        const updatedPeers = peersRef.current.filter(
+          (peer) => peer.peerID !== "screenSharePeerID"
+        );
+        peersRef.current = updatedPeers;
+      } else {
+        // Create a new peer for screen share
+        const screenPeer = createPeer("screenSharePeerID", null, true);
+
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: true,
+        });
+
+        const audioTracks = stream.getAudioTracks();
+        const videoTracks = stream.getVideoTracks();
+
+        if (videoTracks) {
+          videoTracks.forEach((track) => {
+            track.enabled = true;
+          });
+        }
+
+        if (audioTracks) {
+          audioTracks.forEach((track) => {
+            track.enabled = true;
+          });
+        }
+
+        const screenStream = new MediaStream([...videoTracks, ...audioTracks]);
+
+        setScreenShareStream(screenStream);
+
+        stream.getTracks().forEach((track) => track.stop());
+
+        // Add screen share peer to peersRef
+        peersRef.current.push({
+          peerID: "screenSharePeerID",
+          peer: screenPeer,
+          peerName: "Screen Share",
+        });
+      }
+    } catch (error) {
+      console.error("Error sharing screen:", error);
+    }
   };
 
   const validateExistingPeer = (peerID) => {
@@ -184,35 +240,35 @@ const ConferencePage = (props) => {
     joinRoom();
   }, [roomId, username, password, secureRoom]);
 
-  useEffect(() => {
-    const createPeer = (userToSignal, callerID, isInitiator) => {
-      if (myStream) {
-        const peer = new SimplePeer({
-          initiator: isInitiator,
-          trickle: false,
-          stream: myStream,
+  const createPeer = (userToSignal, callerID, isInitiator) => {
+    if (myStream) {
+      const peer = new SimplePeer({
+        initiator: isInitiator,
+        trickle: false,
+        stream: myStream,
+      });
+      if (isInitiator) {
+        peer.on("signal", async (signal) => {
+          await socketRef.current.emit("offer", {
+            userToSignal,
+            callerID,
+            signal,
+            username,
+          });
         });
-        if (isInitiator) {
-          peer.on("signal", async (signal) => {
-            await socketRef.current.emit("offer", {
-              userToSignal,
-              callerID,
-              signal,
-              username,
-            });
-          });
-        } else {
-          peer.on("signal", async (signal) => {
-            await socketRef.current.emit("accept", { signal, callerID });
-          });
-          if (!validateExistingPeer(userToSignal)) {
-            peer.signal(userToSignal);
-          }
+      } else {
+        peer.on("signal", async (signal) => {
+          await socketRef.current.emit("accept", { signal, callerID });
+        });
+        if (!validateExistingPeer(userToSignal)) {
+          peer.signal(userToSignal);
         }
-        return peer;
       }
-    };
+      return peer;
+    }
+  };
 
+  useEffect(() => {
     const addPeers = async (myPeers, isInitiator) => {
       const users = [...peers];
       myPeers.forEach(async (peerDetails) => {
@@ -248,6 +304,20 @@ const ConferencePage = (props) => {
       socketRef.current.on("get-peers", (myPeers) => {
         addPeers(myPeers, true);
       });
+      // socketRef.current.on(
+      //   "offer-screen",
+      //   async ({ userToSignal, callerID, signal }) => {
+      //     const { screenPeer } = createPeer(userToSignal, callerID, false);
+      //     screenPeer.signal(signal);
+      //   }
+      // );
+
+      // socketRef.current.on("accept-screen", ({ signal, callerID }) => {
+      //   const item = peersRef.current.find(
+      //     (peer) => peer && peer.peerID === callerID
+      //   );
+      //   item.screenPeer.signal(signal);
+      // });
 
       socketRef.current.on(
         "user-connected",
@@ -361,6 +431,14 @@ const ConferencePage = (props) => {
         muted
         poster={myPosterImage}
       ></video>
+      {/* {screenShareStream && (
+        <VideoTile
+          index={peers.length} // Assign a unique index to the shared screen
+          peer={screenShareStream} // Pass the screen sharing stream as a peer
+          peerName="Screen Share"
+        />
+      )} */}
+
       <div className="video-grid">
         {peers.length > 0 &&
           peers.map((peerItem, index) => {
@@ -375,6 +453,7 @@ const ConferencePage = (props) => {
           })}
         <p>{roomId}</p>
       </div>
+
       <div className="conf-control-buttons-container">
         <ButtonGroup className="conf-control-buttons">
           <OverlayTrigger
@@ -474,6 +553,15 @@ const ConferencePage = (props) => {
                 icon={myView ? faUserSlash : faUser}
                 className="font-icon"
               />
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger overlay={<Tooltip>Screen Sharing</Tooltip>}>
+            <Button
+              variant="success"
+              onClick={handleScreenShare}
+              className={`roombutton`}
+            >
+              <FontAwesomeIcon icon={faDesktop} className="font-icon" />
             </Button>
           </OverlayTrigger>
           <OverlayTrigger overlay={<Tooltip>Exit Room</Tooltip>}>

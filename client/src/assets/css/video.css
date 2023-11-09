@@ -51,6 +51,7 @@
 .video-tile-container {
   background-color: #000000;
   position: relative;
+  margin: 0.5rem;
 }
 .peer-name {
   position: absolute;
