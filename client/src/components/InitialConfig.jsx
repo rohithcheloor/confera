@@ -34,10 +34,11 @@ const InitialConfig = (props) => {
       String(myOrgName).trim().toLowerCase() !== "confera"
     ) {
       setOrgName(`Confera for ${myOrgName}`);
+      document.title = orgName;
     } else {
       setOrgName(`Confera`);
+      document.title = orgName + " - P2P Video Conferencing";
     }
-    document.title = orgName;
     unsetLoading();
   }, [orgName]);
   useEffect(() => {
