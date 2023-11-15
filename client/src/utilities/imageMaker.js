@@ -1,32 +1,30 @@
-export const createPosterImage = (text, width, height) => {
+export const createPosterImage = (text) => {
+  // If no text is provided, default to "U"
+  if (!text) {
+    text = "U";
+  }
+
+  // Take the first two letters of the text
+  const displayText = text.substring(0, 2);
+
   // Create a canvas element
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 256;
 
   // Get the 2D drawing context
-  const context = canvas.getContext('2d');
+  const context = canvas.getContext("2d");
 
-  // Define the background color and text color
-  context.fillStyle = 'black';
-  context.fillRect(0, 0, width, height);
-  context.font = `${height * 0.7}px Arial`;
-  context.fillStyle = 'white';
+  // Draw a simple text on the canvas
+  context.font = "bold 48px Arial";
+  context.fillStyle = "black";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(displayText, canvas.width / 2, canvas.height / 2);
 
-  // Calculate the position to center the text
-  const textWidth = context.measureText(text).width;
-  const x = String(text).length > 1 ? (width - textWidth * 0.7) / 2 : (width - textWidth * 1.5) / 2;
-  const y = height * 0.8;
+  // Convert the canvas to an image and set it as the source for the img element
+  const image = new Image();
+  image.src = canvas.toDataURL("image/png");
 
-  // Draw the first letter of the text with a horizontal flip transformation
-  context.save();
-  context.scale(-1, 1); // Flip horizontally
-  context.fillText(text, - (x * 3), y);
-  context.restore();
-
-  // Create an image from the canvas
-  const img = new Image();
-  img.src = canvas.toDataURL();
-
-  return canvas.toDataURL();
+  return image.src;
 };

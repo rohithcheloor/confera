@@ -59,7 +59,7 @@ const ConferencePage = (props) => {
 
   const handleChatView = () => {
     setShowChat(!showChat);
-  }
+  };
 
   const validateExistingPeer = (peerID) => {
     if (
@@ -273,9 +273,9 @@ const ConferencePage = (props) => {
       socketRef.current.on("user-disconnected", (peerData) => {
         const { peerId, peerName } = peerData;
         toast(`${peerName} Disconnected`, { theme: "dark", autoClose: 2000 });
-        const peerIndex = peersRef.current && peersRef.current.findIndex(
-          (item) => item.peerID === peerId
-        );
+        const peerIndex =
+          peersRef.current &&
+          peersRef.current.findIndex((item) => item.peerID === peerId);
         const disconnectedPeer = peersRef.current.filter(
           (item) => item.peerID === peerId
         )[0];
@@ -299,8 +299,8 @@ const ConferencePage = (props) => {
     if (!myPosterImage) {
       const myPosterImage =
         String(username).trim().length === 0
-          ? createPosterImage("U", 200, 140)
-          : createPosterImage(username, 200, 140);
+          ? createPosterImage("U")
+          : createPosterImage(username);
       setMyPosterImage(myPosterImage);
     }
   }, [myPosterImage]);
@@ -310,10 +310,10 @@ const ConferencePage = (props) => {
       <video
         className="video-stream-1"
         ref={videoRef}
+        poster={myPosterImage}
         autoPlay
         playsInline
         muted
-        poster={myPosterImage}
       ></video>
       <div className="video-grid">
         {peers.length > 0 &&
@@ -389,10 +389,7 @@ const ConferencePage = (props) => {
               className={`roombutton`}
               onClick={handleChatView}
             >
-              <FontAwesomeIcon
-                icon={faMessage}
-                className="font-icon"
-              />
+              <FontAwesomeIcon icon={faMessage} className="font-icon" />
             </Button>
           </OverlayTrigger>
           <OverlayTrigger overlay={<Tooltip>Exit Room</Tooltip>}>
@@ -416,7 +413,13 @@ const ConferencePage = (props) => {
           setIsPopOpen={setIsPopOpen}
         />
       </Popup>
-      {socketRef.current && <Chat socket={socketRef.current} showChat={showChat} />}
+      {socketRef.current && (
+        <Chat
+          socket={socketRef.current}
+          showChat={showChat}
+          closeChat={handleChatView}
+        />
+      )}
     </React.Fragment>
   );
 };

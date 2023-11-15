@@ -6,9 +6,7 @@ const VideoTile = (props) => {
   const ref = useRef();
   useEffect(() => {
     const posterImage = createPosterImage(
-      String(peerName).slice(0, 2),
-      200,
-      140
+      String(peerName).slice(0, 2)
     );
     if (ref.current) ref.current.poster = posterImage;
   }, [peerName]);
@@ -22,12 +20,12 @@ const VideoTile = (props) => {
   return (
     <div className="video-tile-container">
       <video
+        poster={videoPoster}
         ref={ref}
         id={`peer-${index}`}
         className="video-stream-2"
-        autoPlay
+        // autoPlay
         playsInline
-        poster={videoPoster}
       />
       <p className="peer-name">{peerName}</p>
     </div>
