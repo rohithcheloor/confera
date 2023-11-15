@@ -107,6 +107,7 @@
 	background-color: var(--dark-color-a);
   bottom:0;
   position:fixed;
+  width: 352px;
 }
 
 .chat-form-container form {
