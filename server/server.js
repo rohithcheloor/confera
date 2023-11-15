@@ -55,7 +55,6 @@ io.on("connection", (socket) => {
       secureRoom: false,
     });
   }
-
   socket.on("join-room", ({ roomId, username, password, secureRoom }) => {
     activeSockets.filter((user) => {
       if (user.id === socket.id) {

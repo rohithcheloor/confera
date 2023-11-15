@@ -18,10 +18,12 @@ import {
   faUserSlash,
   faUser,
   faArrowRightFromBracket,
+  faMessage,
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import { toggleCamera, toggleMicrophone } from "../redux/action/deviceActions";
 import { createPosterImage } from "../utilities/imageMaker";
+import Chat from "../components/Chat";
 
 const ConferencePage = (props) => {
   const { userData, deviceData, toggleCamera, toggleMicrophone } = props;
@@ -32,6 +34,7 @@ const ConferencePage = (props) => {
   const [myStream, setMyStream] = useState(null);
   const [myView, setMyView] = useState(true);
   const [myPosterImage, setMyPosterImage] = useState(null);
+  const [showChat, setShowChat] = useState(false);
 
   const videoRef = useRef();
   const peersRef = useRef([]);
@@ -53,6 +56,10 @@ const ConferencePage = (props) => {
     videoRef.current.style.setProperty("display", myView ? "none" : "");
     setMyView(!myView);
   };
+
+  const handleChatView = () => {
+    setShowChat(!showChat);
+  }
 
   const validateExistingPeer = (peerID) => {
     if (
@@ -272,10 +279,10 @@ const ConferencePage = (props) => {
         const disconnectedPeer = peersRef.current.filter(
           (item) => item.peerID === peerId
         )[0];
-        if(disconnectedPeer){
+        if (disconnectedPeer) {
           disconnectedPeer.peer.destroy();
         }
-        if(peersRef.current && peerIndex){
+        if (peersRef.current && peerIndex) {
           delete peersRef.current[peerIndex];
         }
       });
@@ -376,6 +383,18 @@ const ConferencePage = (props) => {
               />
             </Button>
           </OverlayTrigger>
+          <OverlayTrigger overlay={<Tooltip>Chat</Tooltip>}>
+            <Button
+              variant="primary"
+              className={`roombutton`}
+              onClick={handleChatView}
+            >
+              <FontAwesomeIcon
+                icon={faMessage}
+                className="font-icon"
+              />
+            </Button>
+          </OverlayTrigger>
           <OverlayTrigger overlay={<Tooltip>Exit Room</Tooltip>}>
             <Button
               variant="danger"
@@ -397,6 +416,7 @@ const ConferencePage = (props) => {
           setIsPopOpen={setIsPopOpen}
         />
       </Popup>
+      {socketRef.current && <Chat socket={socketRef.current} showChat={showChat} />}
     </React.Fragment>
   );
 };
