@@ -66,6 +66,62 @@
   padding: 10px;
   background-color: #0000002d;
 }
+.chat-window{
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  padding: 1em;
+  background-color: #F1F1F1;
+}
+.chat-hidden{
+  display: none;
+}
+.chat-messages {
+	padding: 15px;
+	max-height: 500px;
+	overflow-y: scroll;
+}
+.chat-messages .message .meta {
+	font-size: 15px;
+	font-weight: bold;
+	color: var(--dark-color-b);
+	opacity: 0.7;
+	margin-bottom: 7px;
+}
+.chat-messages .message .meta span {
+	color: #777;
+}
+
+.chat-messages .message {
+	padding: 5px;
+	margin-bottom: 15px;
+	background-color: #fff;
+	border-radius: 5px;
+	overflow-wrap: break-word;
+}
+
+.chat-form-container {
+	padding: 20px 30px;
+	background-color: var(--dark-color-a);
+  bottom:0;
+  position:fixed;
+  width: 352px;
+}
+
+.chat-form-container form {
+	display: flex;
+}
+
+.chat-form-container input[type='text'] {
+	font-size: 16px;
+	padding: 5px;
+	height: 40px;
+  width:100%;
+	flex: 1;
+}
+
 @media screen and (max-width: 600px) {
   .conf-control-buttons-container {
     display: flex;
