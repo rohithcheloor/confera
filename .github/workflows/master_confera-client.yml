@@ -50,9 +50,6 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-        
-      - name: Move files from /client to /
-        run: mv /client/* /
       
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
