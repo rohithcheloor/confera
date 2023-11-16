@@ -8,9 +8,6 @@ const Chat = (props) => {
   const [messageInput, setMessageInput] = useState("");
 
   useEffect(() => {
-    console.log(showChat);
-  }, [showChat]);
-  useEffect(() => {
     const handleMessages = (message) => {
       outputMessage(message);
     };
@@ -59,7 +56,6 @@ const Chat = (props) => {
     if (!msg) {
       return;
     }
-    console.log(msg);
     socket.emit("chatMessage", msg);
     setMessageInput("");
   };

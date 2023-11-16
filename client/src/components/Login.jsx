@@ -171,11 +171,12 @@ class Login extends Component {
   };
 
   handleJoinRoomWithLink = () => {
+    const joinLink =  String(this.props.joinLink).split("/").reverse().at(0);
     this.props.loginUser(
       this.props.roomId,
       this.state.username,
       this.props.enableSecureRoom,
-      this.props.joinLink,
+      joinLink,
       true
     );
   };
