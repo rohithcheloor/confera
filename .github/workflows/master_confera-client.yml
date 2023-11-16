@@ -21,12 +21,9 @@ jobs:
         with:
           node-version: '18.x'
 
-      - name: Go to client Directory
-        run: cd client
-      
-
       - name: npm install, build, and test
         run: |
+          cd client
           npm install
           npm run build --if-present
           npm run test --if-present
