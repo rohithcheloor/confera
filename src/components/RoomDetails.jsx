@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import Popup from "reactjs-popup";
 import { connect } from "react-redux";
 import { Button } from "react-bootstrap";
 import "../assets/css/popup.css";
 const RoomDetailsMenu = (props) => {
-  const { userData, isPopupOpen, setIsPopOpen } = props;
+  const { userData, setIsPopOpen } = props;
   const { roomId, joinLink } = userData;
   const [copiedMessage, setCopiedMessage] = useState("");
 
@@ -17,12 +16,6 @@ const RoomDetailsMenu = (props) => {
         }, 1500);
       });
     }
-  };
-  const showCopyMessage = () => {
-    setCopiedMessage("Click to copy");
-  };
-  const hideCopyMessage = () => {
-    setCopiedMessage("");
   };
 
   return (

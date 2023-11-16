@@ -20,7 +20,6 @@ import {
   unsetSetupCompleted,
 } from "../redux/action/deviceActions";
 import { connect as reduxConnect } from "react-redux";
-import { toast } from "react-toastify";
 const Setup = (props) => {
   const {
     isMobile,
