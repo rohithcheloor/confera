@@ -25,10 +25,10 @@ jobs:
         run: npm install
           
       - name: npm build
-        run: npm run build
+        run: CI=false npm run build
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+        run: zip release.zip ./build/* -r
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
@@ -58,5 +58,5 @@ jobs:
         with:
           app-name: 'confera-client'
           slot-name: 'Production'
-          package: .
+          package: build
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3E009C0AE2934198970CDB0F1F6C7718 }}
