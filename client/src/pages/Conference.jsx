@@ -174,14 +174,12 @@ const ConferencePage = (props) => {
           });
         } else {
           peer.on("signal", async (signal) => {
-            console.log("Signal Received :", signal);
             await socketRef.current.emit("accept", { signal, callerID });
           });
           if (!validateExistingPeer(userToSignal)) {
             peer.signal(userToSignal);
           }
           peer.on("end", () => {
-            console.log("Peer Closed");
             peer.destroy();
           });
         }
@@ -258,26 +256,6 @@ const ConferencePage = (props) => {
         await item.peer.signal(payload.signal);
       });
 
-      // socketRef.current.on("update-peers", (newPeersList = []) => {
-      //   const updatedPeersList = [];
-      //   // setPeers([]);
-      //   peersRef.current.forEach((item, index) => {
-      //     if (
-      //       newPeersList.includes(item.peerID) &&
-      //       item.peerID !== socketRef.current.id
-      //     ) {
-      //       updatedPeersList.push(item.peer);
-      //     } else if (item.peerID !== socketRef.current.id) {
-      //       const streamData = item.peer.streams[0];
-      //       streamData.getTracks().forEach(track => track.stop());
-      //       item.peer.destroy();
-      //       console.log("Destroying Peer : " + item.peerID);
-      //       delete peersRef.current[index];
-      //     }
-      //   });
-      //   setPeers(updatedPeersList);
-      // });
-
       socketRef.current.on("user-disconnected", (peerData) => {
         const { peerId, peerName } = peerData;
         toast(`${peerName} Disconnected`, { theme: "dark", autoClose: 2000 });
@@ -288,19 +266,11 @@ const ConferencePage = (props) => {
           (item) => item.peerID === peerId
         )[0];
         if (disconnectedPeer) {
-          const streamData = disconnectedPeer.peer.streams[0];
-          console.log(disconnectedPeer.peer);
-          streamData.getTracks().forEach((track) => track.stop());
-          disconnectedPeer.peer.readable = false;
           disconnectedPeer.peer.destroy();
+          peersRef.current.splice(peerIndex, 1);
         }
-        if (peersRef.current && peerIndex) {
-          delete peersRef.current[peerIndex];
-        }
-      });
-
-      window.addEventListener("beforeunload", () => {
-        socketRef.current.emit("disconnect");
+        const filteredList = peers.map((item) => item.peerID !== peerId);
+        setPeers(filteredList);
       });
 
       return () => {
