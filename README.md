@@ -1,2 +1,0 @@
-# confera
-Final Capstone project
