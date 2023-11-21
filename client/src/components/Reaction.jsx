@@ -19,6 +19,7 @@ const Reaction = (props) => {
           });
         }
       }
+
       socket.on('new-emoji', handleNewEmoji);
       return () =>{
         socket.off('new-emoji',handleNewEmoji);
