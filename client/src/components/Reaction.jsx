@@ -25,7 +25,6 @@ const Reaction = (props) => {
       };
     },[socket]);  
    
-
     const handleEmojiClick = (emojiObject) =>{
       if(emojiObject){
         const emoji = emojiObject.emoji;
@@ -38,7 +37,6 @@ const Reaction = (props) => {
         );
         setShowReaction(false);
       }
-      
     }
   return (
     <div className={`reaction-window ${!showReaction && "reaction-hidden"}`}>
