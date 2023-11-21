@@ -8,6 +8,8 @@ on:
 env:
   AZURE_WEBAPP_NAME: confera
   AZURE_WEBAPP_PACKAGE_PATH: '.'
+  REACT_APP_SERVER_URL: 'https://confera-server.azurewebsites.net/'
+  REACT_APP_COMPANY_NAME: 'Confera'
 
 jobs:
   build:
