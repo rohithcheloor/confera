@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from "react-toastify";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "react-bootstrap";
 import EmojiPicker from 'emoji-picker-react';
 
 
@@ -11,7 +9,6 @@ const Reaction = (props) => {
     useEffect(()=>{
       const handleNewEmoji = (data) =>{
         if(data.userId != socket.id){
-          // toast(`${data.username} : ${data.emoji.emoji}`,{autoClose:false});
           toast(
           <span>
             <span>{`${data.username} : `}</span>
@@ -33,7 +30,6 @@ const Reaction = (props) => {
       if(emojiObject){
         const emoji = emojiObject.emoji;
         socket.emit('emoji',{emoji});
-        // toast(`You reacted with ${emoji}`);
         toast(<span>
           <span>You reacted with:</span>
           <span style={{ fontSize: '24px' }}>{`${emoji}`}</span>
