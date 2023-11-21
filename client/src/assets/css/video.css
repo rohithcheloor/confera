@@ -71,10 +71,13 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 360px;
+  width: 433px;
   padding: 1em;
-  background-color: #F1F1F1;
+  background-color: #cbced2;
   z-index: 50;
+}
+.chat-window h2{
+  margin-left: 16px;
 }
 .chat-hidden{
   display: none;
@@ -92,23 +95,26 @@
 	margin-bottom: 7px;
 }
 .chat-messages .message .meta span {
-	color: #777;
+  color: #777;
+  float: right;
+  font-weight: lighter;
+  font-style: italic;
 }
 
 .chat-messages .message {
-	padding: 5px;
-	margin-bottom: 15px;
-	background-color: #fff;
-	border-radius: 5px;
-	overflow-wrap: break-word;
+  padding: 8px;
+  margin-bottom: 7px;
+  background-color: #fff;
+  border-radius: 5px;
+  overflow-wrap: break-word;
 }
 
 .chat-form-container {
-	padding: 20px 30px;
-	background-color: var(--dark-color-a);
-  bottom:0;
-  position:fixed;
-  width: 352px;
+  padding: 21px 7px;
+  background-color: var(--dark-color-a);
+  bottom: 0;
+  position: fixed;
+  width: 407px;
 }
 
 .chat-form-container form {
@@ -117,12 +123,29 @@
 
 .chat-form-container input[type='text'] {
 	font-size: 16px;
-	padding: 5px;
-	height: 40px;
+	padding: 10px;
+	height: 60px;
   width:100%;
 	flex: 1;
+  
 }
-
+.chat-form-container button {
+  background-color: #ff9601;
+  border: none;
+  height: 60px;
+  width: 50px;
+}
+.reaction-window{
+  position: absolute;
+  left: 141px;
+  bottom: 71px;
+  width: 393px;
+  padding: 1em;
+  z-index: 50;
+}
+.reaction-hidden{
+  display:none;
+}
 @media screen and (max-width: 600px) {
   .conf-control-buttons-container {
     display: flex;
