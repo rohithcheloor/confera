@@ -30,10 +30,12 @@ const Reaction = (props) => {
       if(emojiObject){
         const emoji = emojiObject.emoji;
         socket.emit('emoji',{emoji});
-        toast(<span>
-          <span>You reacted with:</span>
-          <span style={{ fontSize: '24px' }}>{`${emoji}`}</span>
-        </span>)
+        toast(
+          <span>
+            <span>You reacted with:</span>
+            <span style={{ fontSize: '24px' }}>{`${emoji}`}</span>
+          </span>
+        );
         setShowReaction(false);
       }
       
