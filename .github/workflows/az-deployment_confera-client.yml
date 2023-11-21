@@ -1,19 +1,17 @@
 name: Build and deploy Node.js app to Azure Web App - sitename
 
-env:
-  AZURE_WEBAPP_NAME: confera-client    # set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
-
 on:
   push:
-    branches:
-      - master
+    branches: [ "az/deployment" ]
   workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: confera-client
+  AZURE_WEBAPP_PACKAGE_PATH: '.'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
 
