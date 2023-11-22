@@ -64,7 +64,7 @@ const ConferencePage = (props) => {
     setShowChat(!showChat);
   };
 
-  const handleReactionView = () =>{
+  const handleReactionView = () => {
     setShowReaction(!showReaction);
   };
 
@@ -167,7 +167,6 @@ const ConferencePage = (props) => {
       if (myStream) {
         const peer = new SimplePeer({
           initiator: isInitiator,
-          trickle: true,
           stream: myStream,
         });
         if (isInitiator) {
@@ -217,6 +216,7 @@ const ConferencePage = (props) => {
           }
         }
       });
+
       if (peersRef && peersRef.current) {
         peersRef.current.filter((i) => i);
         const myPeersList = peersRef.current.map((item) => {
@@ -269,15 +269,12 @@ const ConferencePage = (props) => {
         const peerIndex =
           peersRef.current &&
           peersRef.current.findIndex((item) => item.peerID === peerId);
-        const disconnectedPeer = peersRef.current.filter(
-          (item) => item.peerID === peerId
-        )[0];
-        if (disconnectedPeer) {
-          disconnectedPeer.peer.destroy();
+        if (peerIndex !== null) {
+          peersRef.current[peerIndex].peer.destroy();
           peersRef.current.splice(peerIndex, 1);
+          const filteredList = peersRef.current.map((item) => item.peer);
+          setPeers(filteredList);
         }
-        const filteredList = peers.map((item) => item.peerID !== peerId);
-        setPeers(filteredList);
       });
 
       return () => {
@@ -309,17 +306,16 @@ const ConferencePage = (props) => {
         muted
       ></video>
       <div className="video-grid">
-        {peers.length > 0 &&
-          peers.map((peerItem, index) => {
-            return (
-              <VideoTile
-                index={index}
-                key={index}
-                peer={peerItem}
-                peerName={getPeerName(peerItem.peerID)}
-              />
-            );
-          })}
+        {peers.map((peerItem, index) => {
+          return (
+            <VideoTile
+              index={index}
+              key={index}
+              peer={peerItem}
+              peerName={getPeerName(peerItem.peerID)}
+            />
+          );
+        })}
       </div>
       <div className="conf-control-buttons-container">
         <ButtonGroup className="conf-control-buttons">
@@ -378,7 +374,7 @@ const ConferencePage = (props) => {
           </OverlayTrigger>
           <OverlayTrigger overlay={<Tooltip>Reactions</Tooltip>}>
             <Button
-              variant="warning"
+              variant="success"
               className={`roombutton`}
               onClick={handleReactionView}
             >
@@ -387,7 +383,7 @@ const ConferencePage = (props) => {
           </OverlayTrigger>
           <OverlayTrigger overlay={<Tooltip>Chat</Tooltip>}>
             <Button
-              variant="primary"
+              variant="success"
               className={`roombutton`}
               onClick={handleChatView}
             >
@@ -421,16 +417,15 @@ const ConferencePage = (props) => {
           showChat={showChat}
           closeChat={handleChatView}
         />
-        )}
-        {socketRef.current && (
-          <Reaction
-            socket={socketRef.current}
-            showReaction={showReaction}
-            setShowReaction={setShowReaction}
-            closeChat={handleReactionView}
-          />
-        )}
-      
+      )}
+      {socketRef.current && (
+        <Reaction
+          socket={socketRef.current}
+          showReaction={showReaction}
+          setShowReaction={setShowReaction}
+          closeChat={handleReactionView}
+        />
+      )}
     </React.Fragment>
   );
 };
