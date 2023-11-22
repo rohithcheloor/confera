@@ -110,75 +110,90 @@ class Login extends Component {
     }
   };
 
-  handleCreateRoom = async () => {
-    const createRoom = await api_post("api/create-room", {
-      roomId: this.state.roomId,
-      password: this.state.password,
-      enableSecureRoom: this.state.enableSecureRoom,
-    });
-    if (createRoom.data && createRoom.data.roomId) {
-      this.props.loginUser(
-        createRoom.data.roomId,
-        this.state.username,
-        createRoom.data.isPrivateRoom,
-        createRoom.data.joinLink,
-        true
-      );
+  handleDisplayNameValidation = () => {
+    if (!this.state.username || String(this.state.username).trim() === "") {
+      toast.error("Please Enter a display name", { theme: "colored" });
+      return false;
     } else {
-      if (createRoom.data && createRoom.data.message) {
-        toast.error(createRoom.data.message, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+      return true;
+    }
+  };
+
+  handleCreateRoom = async () => {
+    if (this.handleDisplayNameValidation()) {
+      const createRoom = await api_post("api/create-room", {
+        roomId: this.state.roomId,
+        password: this.state.password,
+        enableSecureRoom: this.state.enableSecureRoom,
+      });
+      if (createRoom.data && createRoom.data.roomId) {
+        this.props.loginUser(
+          createRoom.data.roomId,
+          this.state.username,
+          createRoom.data.isPrivateRoom,
+          createRoom.data.joinLink,
+          true
+        );
+      } else {
+        if (createRoom.data && createRoom.data.message) {
+          toast.error(createRoom.data.message, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
+        }
       }
     }
   };
 
   handleJoinRoom = async () => {
-    const authenticateRoom = await api_post("api/room/authenticate", {
-      roomId: this.state.roomId,
-      password: this.state.password,
-      secureRoom: this.state.enableSecureRoom,
-    });
-    if (authenticateRoom.data && authenticateRoom.data.success) {
-      this.props.loginUser(
-        this.state.roomId,
-        this.state.username,
-        this.state.enableSecureRoom,
-        authenticateRoom.data.joinLink,
-        true
-      );
-    } else {
-      if (authenticateRoom.data && authenticateRoom.data.message) {
-        toast.error(authenticateRoom.data.message, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-        });
+    if (this.handleDisplayNameValidation()) {
+      const authenticateRoom = await api_post("api/room/authenticate", {
+        roomId: this.state.roomId,
+        password: this.state.password,
+        secureRoom: this.state.enableSecureRoom,
+      });
+      if (authenticateRoom.data && authenticateRoom.data.success) {
+        this.props.loginUser(
+          this.state.roomId,
+          this.state.username,
+          this.state.enableSecureRoom,
+          authenticateRoom.data.joinLink,
+          true
+        );
+      } else {
+        if (authenticateRoom.data && authenticateRoom.data.message) {
+          toast.error(authenticateRoom.data.message, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+          });
+        }
       }
     }
   };
 
   handleJoinRoomWithLink = () => {
-    const joinLink =  String(this.props.joinLink).split("/").reverse().at(0);
-    this.props.loginUser(
-      this.props.roomId,
-      this.state.username,
-      this.props.enableSecureRoom,
-      joinLink,
-      true
-    );
+    if (this.handleDisplayNameValidation()) {
+      const joinLink = String(this.props.joinLink).split("/").reverse().at(0);
+      this.props.loginUser(
+        this.props.roomId,
+        this.state.username,
+        this.props.enableSecureRoom,
+        joinLink,
+        true
+      );
+    }
   };
 
   sanitizeRoomIdInput = (roomId) => {
