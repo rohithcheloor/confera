@@ -297,6 +297,12 @@ const ConferencePage = (props) => {
 
   return (
     <React.Fragment>
+      <header>
+        <meta
+          name="og:description"
+          content={"You are invited to Room " + roomId}
+        />
+      </header>
       <video
         className="video-stream-1"
         ref={videoRef}

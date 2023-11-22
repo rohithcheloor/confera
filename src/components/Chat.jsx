@@ -38,6 +38,11 @@ const Chat = (props) => {
     }
     const div = document.createElement("div");
     div.classList.add("message");
+    if(message.userId === socket.id){
+      div.classList.add("my-message");
+    }else{
+      div.classList.add("peer-message");
+    }
     const p = document.createElement("p");
     p.classList.add("meta");
     p.innerText = message.username;
@@ -78,7 +83,7 @@ const Chat = (props) => {
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
               />
-              <Button variant="primary" type="submit">
+              <Button variant="success" type="submit">
                 <FontAwesomeIcon icon={faArrowRight} />
               </Button>
             </form>
