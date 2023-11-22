@@ -13,7 +13,6 @@ const VideoTile = (props) => {
     const posterImage = createPosterImage(String(peerName).slice(0, 2));
     if (ref.current) {
       ref.current.poster = posterImage;
-      console.log(ref.current.poster);
       ref.current.addEventListener("pause", handlePause);
     }
 

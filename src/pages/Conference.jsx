@@ -167,7 +167,6 @@ const ConferencePage = (props) => {
       if (myStream) {
         const peer = new SimplePeer({
           initiator: isInitiator,
-          trickle: true,
           stream: myStream,
         });
         if (isInitiator) {
@@ -270,15 +269,12 @@ const ConferencePage = (props) => {
         const peerIndex =
           peersRef.current &&
           peersRef.current.findIndex((item) => item.peerID === peerId);
-        const disconnectedPeer = peersRef.current.filter(
-          (item) => item.peerID === peerId
-        )[0];
-        if (disconnectedPeer) {
-          disconnectedPeer.peer.destroy();
+        if (peerIndex !== null) {
+          peersRef.current[peerIndex].peer.destroy();
           peersRef.current.splice(peerIndex, 1);
+          const filteredList = peersRef.current.map((item) => item.peer);
+          setPeers(filteredList);
         }
-        const filteredList = peers.map((item) => item.peerID !== peerId);
-        setPeers(filteredList);
       });
 
       return () => {
@@ -310,17 +306,16 @@ const ConferencePage = (props) => {
         muted
       ></video>
       <div className="video-grid">
-        {peers.length > 0 &&
-          peers.map((peerItem, index) => {
-            return (
-              <VideoTile
-                index={index}
-                key={index}
-                peer={peerItem}
-                peerName={getPeerName(peerItem.peerID)}
-              />
-            );
-          })}
+        {peers.map((peerItem, index) => {
+          return (
+            <VideoTile
+              index={index}
+              key={index}
+              peer={peerItem}
+              peerName={getPeerName(peerItem.peerID)}
+            />
+          );
+        })}
       </div>
       <div className="conf-control-buttons-container">
         <ButtonGroup className="conf-control-buttons">
