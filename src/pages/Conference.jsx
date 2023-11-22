@@ -19,11 +19,13 @@ import {
   faUser,
   faArrowRightFromBracket,
   faMessage,
+  faSmile,
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import { toggleCamera, toggleMicrophone } from "../redux/action/deviceActions";
 import { createPosterImage } from "../utilities/imageMaker";
 import Chat from "../components/Chat";
+import Reaction from "../components/Reaction";
 
 const ConferencePage = (props) => {
   const { userData, deviceData, toggleCamera, toggleMicrophone } = props;
@@ -35,6 +37,7 @@ const ConferencePage = (props) => {
   const [myView, setMyView] = useState(true);
   const [myPosterImage, setMyPosterImage] = useState(null);
   const [showChat, setShowChat] = useState(false);
+  const [showReaction, setShowReaction] = useState(false);
 
   const videoRef = useRef();
   const peersRef = useRef([]);
@@ -59,6 +62,10 @@ const ConferencePage = (props) => {
 
   const handleChatView = () => {
     setShowChat(!showChat);
+  };
+
+  const handleReactionView = () =>{
+    setShowReaction(!showReaction);
   };
 
   const validateExistingPeer = (peerID) => {
@@ -369,6 +376,15 @@ const ConferencePage = (props) => {
               />
             </Button>
           </OverlayTrigger>
+          <OverlayTrigger overlay={<Tooltip>Reactions</Tooltip>}>
+            <Button
+              variant="warning"
+              className={`roombutton`}
+              onClick={handleReactionView}
+            >
+              <FontAwesomeIcon icon={faSmile} className="font-icon" />
+            </Button>
+          </OverlayTrigger>
           <OverlayTrigger overlay={<Tooltip>Chat</Tooltip>}>
             <Button
               variant="primary"
@@ -405,7 +421,16 @@ const ConferencePage = (props) => {
           showChat={showChat}
           closeChat={handleChatView}
         />
-      )}
+        )}
+        {socketRef.current && (
+          <Reaction
+            socket={socketRef.current}
+            showReaction={showReaction}
+            setShowReaction={setShowReaction}
+            closeChat={handleReactionView}
+          />
+        )}
+      
     </React.Fragment>
   );
 };
