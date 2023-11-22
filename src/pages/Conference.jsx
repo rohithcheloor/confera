@@ -64,7 +64,7 @@ const ConferencePage = (props) => {
     setShowChat(!showChat);
   };
 
-  const handleReactionView = () =>{
+  const handleReactionView = () => {
     setShowReaction(!showReaction);
   };
 
@@ -217,6 +217,7 @@ const ConferencePage = (props) => {
           }
         }
       });
+
       if (peersRef && peersRef.current) {
         peersRef.current.filter((i) => i);
         const myPeersList = peersRef.current.map((item) => {
@@ -378,7 +379,7 @@ const ConferencePage = (props) => {
           </OverlayTrigger>
           <OverlayTrigger overlay={<Tooltip>Reactions</Tooltip>}>
             <Button
-              variant="warning"
+              variant="success"
               className={`roombutton`}
               onClick={handleReactionView}
             >
@@ -387,7 +388,7 @@ const ConferencePage = (props) => {
           </OverlayTrigger>
           <OverlayTrigger overlay={<Tooltip>Chat</Tooltip>}>
             <Button
-              variant="primary"
+              variant="success"
               className={`roombutton`}
               onClick={handleChatView}
             >
@@ -421,16 +422,15 @@ const ConferencePage = (props) => {
           showChat={showChat}
           closeChat={handleChatView}
         />
-        )}
-        {socketRef.current && (
-          <Reaction
-            socket={socketRef.current}
-            showReaction={showReaction}
-            setShowReaction={setShowReaction}
-            closeChat={handleReactionView}
-          />
-        )}
-      
+      )}
+      {socketRef.current && (
+        <Reaction
+          socket={socketRef.current}
+          showReaction={showReaction}
+          setShowReaction={setShowReaction}
+          closeChat={handleReactionView}
+        />
+      )}
     </React.Fragment>
   );
 };
