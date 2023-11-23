@@ -168,6 +168,16 @@ const ConferencePage = (props) => {
         const peer = new SimplePeer({
           initiator: isInitiator,
           stream: myStream,
+          config: {
+            iceServers: [
+              { urls: "stun:freestun.net:5350" },
+              {
+                urls: "turns:freestun.tel:5350",
+                username: "free",
+                credential: "free",
+              },
+            ],
+          },
         });
         if (isInitiator) {
           peer.on("signal", async (signal) => {
