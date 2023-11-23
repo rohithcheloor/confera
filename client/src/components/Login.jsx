@@ -5,6 +5,7 @@ import { api_post } from "../utilities/apiRequest";
 import { LoginUser, setLoggedIn } from "../redux/action/loginActions";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
+import Checkout from "../pages/Checkout";
 
 class Login extends Component {
   constructor(props) {
@@ -344,6 +345,7 @@ class Login extends Component {
             </Tabs>
           </Row>
         )}
+        <Checkout />
       </Container>
     );
   }
