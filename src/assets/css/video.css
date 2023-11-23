@@ -71,7 +71,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 433px;
+  width: 500px;
   padding: 1em;
   background-color: #000000f0;
   color: #fcfcfc;
@@ -132,7 +132,7 @@
   background-color: var(--dark-color-a);
   bottom: 0;
   position: fixed;
-  width: 407px;
+  width: 470px;
 }
 
 .chat-form-container form {
@@ -161,9 +161,10 @@
 
 .reaction-window{
   position: absolute;
-  left: 141px;
-  bottom: 71px;
-  width: 393px;
+  left: auto;
+  right: auto;
+  bottom: 60px;
+  width: 100%;
   padding: 1em;
   z-index: 50;
 }
@@ -171,6 +172,17 @@
   display:none;
 }
 @media screen and (max-width: 786px) {
+  .video-stream-1{
+    background-color: #000000e0;
+  }
+  .chat-window{
+    width: 100%;
+    height: calc(100% - 59px);
+  }
+  .chat-form-container{
+    position: absolute;
+    width: calc(100% - 30px);
+  }
   .conf-control-buttons-container {
     display: flex;
     justify-content: center;
