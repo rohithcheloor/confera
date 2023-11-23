@@ -2,6 +2,9 @@ import React, { useEffect, useRef } from "react";
 
 const VideoTile = (props) => {
   const { peer, index, peerName, videoPoster } = props;
+
+  console.log("the props", props);
+
   const ref = useRef();
   useEffect(() => {
     peer.on("stream", (stream) => {

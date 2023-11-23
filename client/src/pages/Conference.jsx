@@ -1,3 +1,4 @@
+// Importing required libraries and components
 import React, { useState, useEffect, useRef } from "react";
 import Popup from "reactjs-popup";
 import io from "socket.io-client";
@@ -40,17 +41,29 @@ import {
 import { createPosterImage } from "../utilities/imageMaker";
 
 const ConferencePage = (props) => {
-  const { userData, deviceData, toggleCamera, toggleMicrophone } = props;
-  const { cameraID, microphoneID, isCameraOn, isMicOn } = deviceData;
-  const { roomId, secureRoom, username, password } = userData;
-  const { setCameraID, setMicrophoneID, setSpeakerID } = props;
+  // Destructuring props
+  const {
+    userData,
+    deviceData,
+    toggleCamera,
+    toggleMicrophone,
+    setCameraID,
+    setMicrophoneID,
+    setSpeakerID,
+  } = props;
 
+  // Destructuring deviceData
+  const { cameraID, microphoneID, isCameraOn, isMicOn } = deviceData;
+
+  // Destructuring userData
+  const { roomId, secureRoom, username, password } = userData;
+
+  // State variables
   const [peers, setPeers] = useState([]);
   const [myStream, setMyStream] = useState(null);
   const [myView, setMyView] = useState(true);
   const [myPosterImage, setMyPosterImage] = useState(null);
-  const [screenShareStream, setScreenShareStream] = useState(null);
-
+  const [screenShareStream, setScreenShareStream] = useState(0);
   const [videoDevices, setVideoDevices] = useState([]);
   const [audioDevices, setAudioDevices] = useState([]);
   const [speakerDevices, setSpeakerDevices] = useState([]);
@@ -58,10 +71,83 @@ const ConferencePage = (props) => {
   const [audioDeviceName, setAudioDeviceName] = useState(null);
   const [speakerDeviceName, setSpeakerDeviceName] = useState(null);
 
+  // Refs
   const videoRef = useRef();
   const peersRef = useRef([]);
   const socketRef = useRef();
+  const senders = useRef([]);
+  // Function to handle screen sharing
+  const handleScreenShare = async () => {
+    try {
+      if (screenShareStream) {
+        // If screen sharing is already active, stop it
+        screenShareStream.getTracks().forEach((track) => track.stop());
+        setScreenShareStream(null);
 
+        // Remove screen share peer from peersRef
+        const updatedPeers = peersRef.current.filter(
+          (peer) => peer.peerID !== "screenSharePeerID"
+        );
+        peersRef.current = updatedPeers;
+      } else {
+        // Create a new peer for screen share
+        const screenPeer = createPeer("screenSharePeerID", null, true);
+
+        // Get screen sharing stream
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          cursor: true,
+        });
+
+        // Add screen share peer to peersRef
+        peersRef.current.push({
+          peerID: "screenSharePeerID",
+          peer: screenPeer,
+          peerName: "Screen Share",
+        });
+
+        // Set screen sharing stream
+        setScreenShareStream(stream);
+
+        // Replace the video track with the screen share track
+        const videoSender = senders.current.find(
+          (sender) => sender.track.kind === "video"
+        );
+
+        if (videoSender) {
+          videoSender.replaceTrack(stream.getTracks()[0]);
+        } else {
+          console.error("No video sender found");
+        }
+
+        // Handling screen track end
+        stream.getTracks()[0].onended = function () {
+          const videoSender = senders.current.find(
+            (sender) => sender.track.kind === "video"
+          );
+
+          if (videoSender) {
+            videoSender.replaceTrack(peersRef.current.getTracks()[1]);
+          } else {
+            console.error("No video sender found");
+          }
+
+          // Stop the screen sharing stream
+          stream.getTracks().forEach((track) => track.stop());
+
+          // Remove screen share peer from peersRef
+          const updatedPeers = peersRef.current.filter(
+            (peer) => peer.peerID !== "screenSharePeerID"
+          );
+          peersRef.current = updatedPeers;
+          setScreenShareStream(null);
+        };
+      }
+    } catch (error) {
+      console.error("Error sharing screen:", error);
+    }
+  };
+
+  // Event handlers
   const handleCamera = () => {
     toggleCamera();
   };
@@ -79,75 +165,25 @@ const ConferencePage = (props) => {
     setMyView(!myView);
   };
 
+  // Function to handle camera change
   const handleCameraChange = (id, name) => {
     setCameraID(id);
     setVideoDeviceName(name);
   };
 
+  // Function to handle microphone change
   const handleMicChange = (id, name) => {
     setMicrophoneID(id);
     setAudioDeviceName(name);
   };
 
+  // Function to handle speaker change
   const handleSpeakerChange = (id, name) => {
     setSpeakerID(id);
     setSpeakerDeviceName(name);
   };
 
-  const handleScreenShare = async () => {
-    try {
-      if (screenShareStream) {
-        // If screen sharing is already active, stop it
-        screenShareStream.getTracks().forEach((track) => track.stop());
-        setScreenShareStream(null);
-
-        // Remove screen share peer from peersRef
-        const updatedPeers = peersRef.current.filter(
-          (peer) => peer.peerID !== "screenSharePeerID"
-        );
-        peersRef.current = updatedPeers;
-      } else {
-        // Create a new peer for screen share
-        const screenPeer = createPeer("screenSharePeerID", null, true);
-
-        const stream = await navigator.mediaDevices.getDisplayMedia({
-          video: true,
-          audio: true,
-        });
-
-        const audioTracks = stream.getAudioTracks();
-        const videoTracks = stream.getVideoTracks();
-
-        if (videoTracks) {
-          videoTracks.forEach((track) => {
-            track.enabled = true;
-          });
-        }
-
-        if (audioTracks) {
-          audioTracks.forEach((track) => {
-            track.enabled = true;
-          });
-        }
-
-        const screenStream = new MediaStream([...videoTracks, ...audioTracks]);
-
-        setScreenShareStream(screenStream);
-
-        stream.getTracks().forEach((track) => track.stop());
-
-        // Add screen share peer to peersRef
-        peersRef.current.push({
-          peerID: "screenSharePeerID",
-          peer: screenPeer,
-          peerName: "Screen Share",
-        });
-      }
-    } catch (error) {
-      console.error("Error sharing screen:", error);
-    }
-  };
-
+  // Function to validate existing peer
   const validateExistingPeer = (peerID) => {
     if (
       peersRef.current &&
@@ -159,6 +195,7 @@ const ConferencePage = (props) => {
     }
   };
 
+  // Function to get peer name by ID
   const getPeerName = (peerId) => {
     if (peersRef.current) {
       const peerDetails = peersRef.current.filter(
@@ -172,11 +209,15 @@ const ConferencePage = (props) => {
     }
   };
 
+  // State for popup
   const [isPopupOpen, setIsPopOpen] = useState(false);
+
+  // Function to open popup
   const openPopup = () => {
     setIsPopOpen(true);
   };
 
+  // useEffect for connecting to socket and setting up initial stream
   useEffect(() => {
     socketRef.current = io(API_SERVER_URL);
     const constraints = {
@@ -227,6 +268,7 @@ const ConferencePage = (props) => {
     }
   }, [cameraID, microphoneID, isCameraOn, isMicOn]);
 
+  // useEffect for joining the room
   useEffect(() => {
     const joinRoom = async () => {
       await socketRef.current.emit("join-room", {
@@ -240,6 +282,7 @@ const ConferencePage = (props) => {
     joinRoom();
   }, [roomId, username, password, secureRoom]);
 
+  // Function to create a peer
   const createPeer = (userToSignal, callerID, isInitiator) => {
     if (myStream) {
       const peer = new SimplePeer({
@@ -268,7 +311,9 @@ const ConferencePage = (props) => {
     }
   };
 
+  // useEffect for handling peers and socket events
   useEffect(() => {
+    console.log("inside useEffect...");
     const addPeers = async (myPeers, isInitiator) => {
       const users = [...peers];
       myPeers.forEach(async (peerDetails) => {
@@ -304,20 +349,6 @@ const ConferencePage = (props) => {
       socketRef.current.on("get-peers", (myPeers) => {
         addPeers(myPeers, true);
       });
-      // socketRef.current.on(
-      //   "offer-screen",
-      //   async ({ userToSignal, callerID, signal }) => {
-      //     const { screenPeer } = createPeer(userToSignal, callerID, false);
-      //     screenPeer.signal(signal);
-      //   }
-      // );
-
-      // socketRef.current.on("accept-screen", ({ signal, callerID }) => {
-      //   const item = peersRef.current.find(
-      //     (peer) => peer && peer.peerID === callerID
-      //   );
-      //   item.screenPeer.signal(signal);
-      // });
 
       socketRef.current.on(
         "user-connected",
@@ -367,7 +398,6 @@ const ConferencePage = (props) => {
           setPeers(newPeersList);
         }
       });
-
       return () => {
         socketRef.current.off("get-peers");
         socketRef.current.off("user-connected");
@@ -376,6 +406,7 @@ const ConferencePage = (props) => {
     }
   }, [myStream]);
 
+  // useEffect for creating and setting up poster image
   useEffect(() => {
     if (!myPosterImage) {
       const myPosterImage =
@@ -386,6 +417,7 @@ const ConferencePage = (props) => {
     }
   }, [myPosterImage]);
 
+  // useEffect for fetching media devices on component mount
   useEffect(() => {
     const getMediaDevices = async () => {
       try {
@@ -421,8 +453,10 @@ const ConferencePage = (props) => {
     getMediaDevices();
   }, []);
 
+  // JSX for rendering the component
   return (
     <React.Fragment>
+      {/* Local Video Stream */}
       <video
         className="video-stream-1"
         ref={videoRef}
@@ -431,14 +465,8 @@ const ConferencePage = (props) => {
         muted
         poster={myPosterImage}
       ></video>
-      {/* {screenShareStream && (
-        <VideoTile
-          index={peers.length} // Assign a unique index to the shared screen
-          peer={screenShareStream} // Pass the screen sharing stream as a peer
-          peerName="Screen Share"
-        />
-      )} */}
 
+      {/* Video Tiles for Peers */}
       <div className="video-grid">
         {peers.length > 0 &&
           peers.map((peerItem, index) => {
@@ -454,8 +482,10 @@ const ConferencePage = (props) => {
         <p>{roomId}</p>
       </div>
 
+      {/* Conference Control Buttons */}
       <div className="conf-control-buttons-container">
         <ButtonGroup className="conf-control-buttons">
+          {/* Toggle Camera Button */}
           <OverlayTrigger
             overlay={<Tooltip>Turn {isCameraOn ? "off" : "on"} Video</Tooltip>}
           >
@@ -477,6 +507,7 @@ const ConferencePage = (props) => {
                 className="btn-sm roombutton-dropdown"
               />
 
+              {/* Video Devices Dropdown */}
               <Dropdown.Menu>
                 {videoDevices.map((device, index) => (
                   <Dropdown.Item
@@ -493,6 +524,7 @@ const ConferencePage = (props) => {
             </Dropdown>
           </OverlayTrigger>
 
+          {/* Toggle Microphone Button */}
           <OverlayTrigger
             overlay={<Tooltip>Turn {isMicOn ? "off" : "on"} Mic </Tooltip>}
           >
@@ -508,13 +540,13 @@ const ConferencePage = (props) => {
                 />
               </Button>
 
+              {/* Audio Devices Dropdown */}
               <Dropdown.Toggle
                 split
                 variant="success"
                 id="dropdown-split-basic"
                 className="btn-sm roombutton-dropdown"
               />
-
               <Dropdown.Menu>
                 {audioDevices.map((device, index) => (
                   <Dropdown.Item
@@ -530,6 +562,8 @@ const ConferencePage = (props) => {
               </Dropdown.Menu>
             </Dropdown>
           </OverlayTrigger>
+
+          {/* Room Information Button */}
           <OverlayTrigger overlay={<Tooltip>Show Room Information</Tooltip>}>
             <Button
               variant="success"
@@ -539,6 +573,8 @@ const ConferencePage = (props) => {
               <FontAwesomeIcon icon={faInfo} className="font-icon" />
             </Button>
           </OverlayTrigger>
+
+          {/* Toggle Local Camera View Button */}
           <OverlayTrigger
             overlay={
               <Tooltip>{myView ? "Hide" : "Show"} my Camera View</Tooltip>
@@ -555,6 +591,8 @@ const ConferencePage = (props) => {
               />
             </Button>
           </OverlayTrigger>
+
+          {/* Screen Sharing Button */}
           <OverlayTrigger overlay={<Tooltip>Screen Sharing</Tooltip>}>
             <Button
               variant="success"
@@ -564,6 +602,8 @@ const ConferencePage = (props) => {
               <FontAwesomeIcon icon={faDesktop} className="font-icon" />
             </Button>
           </OverlayTrigger>
+
+          {/* Exit Room Button */}
           <OverlayTrigger overlay={<Tooltip>Exit Room</Tooltip>}>
             <Button
               variant="danger"
@@ -578,6 +618,8 @@ const ConferencePage = (props) => {
           </OverlayTrigger>
         </ButtonGroup>
       </div>
+
+      {/* Room Details Popup */}
       <Popup open={isPopupOpen} onClose={() => setIsPopOpen(false)}>
         <RoomDetailsMenu
           userData={userData}
@@ -589,6 +631,7 @@ const ConferencePage = (props) => {
   );
 };
 
+// mapStateToProps function to get data from the Redux store
 const mapStateToProps = (state) => {
   const { roomId, username, secureRoom, joinLink } = state.login;
   const { cameraID, microphoneID, speakerID, isCameraOn, isMicOn } =
@@ -614,6 +657,7 @@ const mapStateToProps = (state) => {
   };
 };
 
+// mapDispatchToProps function to dispatch actions to the Redux store
 const mapDispatchToProps = (dispatch) => {
   return {
     toggleCamera: () => dispatch(toggleCamera()),
@@ -624,4 +668,5 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
+// Connecting the component to the Redux store
 export default connect(mapStateToProps, mapDispatchToProps)(ConferencePage);
