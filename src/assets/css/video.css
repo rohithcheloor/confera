@@ -10,6 +10,7 @@
   max-height: 150px;
   transform: rotateY(180deg);
   box-shadow: 0px 0px 25px #ffffff4c;
+  transform: none;
 }
 .video-grid {
   padding: 1em;
@@ -66,7 +67,7 @@
   padding: 10px;
   background-color: #0000002d;
 }
-.chat-window{
+.chat-window {
   position: absolute;
   top: 0;
   right: 0;
@@ -77,16 +78,16 @@
   color: #fcfcfc;
   z-index: 50;
 }
-.chat-window h2{
+.chat-window h2 {
   margin-left: 16px;
 }
-.chat-hidden{
+.chat-hidden {
   display: none;
 }
 .chat-messages {
-	padding: 15px;
+  padding: 15px;
   max-height: calc(100vh - 150px);
-	overflow-y: auto;
+  overflow-y: auto;
 }
 .chat-messages .message {
   margin-right: 50px;
@@ -97,11 +98,11 @@
   margin-right: 0;
 }
 .chat-messages .meta {
-	font-size: 15px;
-	font-weight: bold;
-	color: #fcfcfc;
-	opacity: 0.7;
-	margin-bottom: 7px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #fcfcfc;
+  opacity: 0.7;
+  margin-bottom: 7px;
 }
 .chat-messages .message .meta span {
   color: #bcbcbc;
@@ -118,12 +119,12 @@
   border-radius: 5px;
   overflow-wrap: break-word;
 }
-.chat-messages .my-message{
+.chat-messages .my-message {
   border-bottom-right-radius: 0px !important;
   background-color: rgb(18, 26, 18);
 }
 
-.chat-messages .peer-message{
+.chat-messages .peer-message {
   border-top-left-radius: 0px !important;
 }
 
@@ -136,15 +137,15 @@
 }
 
 .chat-form-container form {
-	display: flex;
+  display: flex;
 }
 
-.chat-form-container input[type='text'] {
-	font-size: 16px;
-	padding: 10px;
-	height: 60px;
-  width:100%;
-	flex: 1;
+.chat-form-container input[type="text"] {
+  font-size: 16px;
+  padding: 10px;
+  height: 60px;
+  width: 100%;
+  flex: 1;
   outline: none !important;
   border-radius: 24px;
   border-top-right-radius: 0px;
@@ -159,7 +160,7 @@
   border-bottom-left-radius: 0px;
 }
 
-.reaction-window{
+.reaction-window {
   position: absolute;
   left: auto;
   right: auto;
@@ -168,18 +169,18 @@
   padding: 1em;
   z-index: 50;
 }
-.reaction-hidden{
-  display:none;
+.reaction-hidden {
+  display: none;
 }
 @media screen and (max-width: 786px) {
-  .video-stream-1{
+  .video-stream-1 {
     background-color: #000000e0;
   }
-  .chat-window{
+  .chat-window {
     width: 100%;
     height: calc(100% - 59px);
   }
-  .chat-form-container{
+  .chat-form-container {
     position: absolute;
     width: calc(100% - 30px);
   }

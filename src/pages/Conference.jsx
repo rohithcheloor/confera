@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Popup from "reactjs-popup";
 import io from "socket.io-client";
 import SimplePeer from "simple-peer";
+import { useReactMediaRecorder } from "react-media-recorder";
 import "../assets/css/video.css";
 import VideoTile from "../components/Video";
 import { connect } from "react-redux";
@@ -20,6 +21,8 @@ import {
   faArrowRightFromBracket,
   faMessage,
   faSmile,
+  faRecordVinyl,
+  faEraser,
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import { toggleCamera, toggleMicrophone } from "../redux/action/deviceActions";
@@ -31,6 +34,12 @@ const ConferencePage = (props) => {
   const { userData, deviceData, toggleCamera, toggleMicrophone } = props;
   const { cameraID, microphoneID, isCameraOn, isMicOn } = deviceData;
   const { roomId, secureRoom, username, password } = userData;
+  // Screen Recording
+  const { status, startRecording, stopRecording, mediaBlobUrl, clearBlobUrl } =
+    useReactMediaRecorder({
+      video: true,
+      screen: true,
+    });
 
   const [peers, setPeers] = useState([]);
   const [myStream, setMyStream] = useState(null);
@@ -99,6 +108,18 @@ const ConferencePage = (props) => {
     setIsPopOpen(true);
   };
 
+  const toggleRecording = () => {
+    if (status === "idle") {
+      startRecording();
+    } else {
+      stopRecording();
+    }
+  };
+  const clearRecording = () => {
+    if (status === "stopped") {
+      clearBlobUrl();
+    }
+  };
   useEffect(() => {
     socketRef.current = io(API_SERVER_URL);
     const constraints = {
@@ -321,6 +342,15 @@ const ConferencePage = (props) => {
         playsInline
         muted
       ></video>
+      {mediaBlobUrl && (
+        <video
+          src={mediaBlobUrl}
+          className="video-stream-1"
+          autoPlay
+          loop
+          controls
+        ></video>
+      )}
       <div className="video-grid">
         {peers.map((peerItem, index) => {
           return (
@@ -406,6 +436,33 @@ const ConferencePage = (props) => {
               <FontAwesomeIcon icon={faMessage} className="font-icon" />
             </Button>
           </OverlayTrigger>
+          <OverlayTrigger
+            overlay={
+              <Tooltip>
+                Turn {status !== "idle" ? "off" : "on"} Recording
+              </Tooltip>
+            }
+          >
+            <Button
+              variant={status !== "idle" ? "success" : "danger"}
+              onClick={toggleRecording}
+              className={`roombutton`}
+            >
+              <FontAwesomeIcon icon={faRecordVinyl} className="font-icon" />
+            </Button>
+          </OverlayTrigger>
+          {mediaBlobUrl && (
+            <OverlayTrigger overlay={<Tooltip>Clear Recording</Tooltip>}>
+              <Button
+                variant={status !== "idle" ? "success" : "danger"}
+                onClick={clearRecording}
+                className={`roombutton`}
+              >
+                <FontAwesomeIcon icon={faEraser} className="font-icon" />
+              </Button>
+            </OverlayTrigger>
+          )}
+
           <OverlayTrigger overlay={<Tooltip>Exit Room</Tooltip>}>
             <Button
               variant="danger"
