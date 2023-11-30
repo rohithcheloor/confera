@@ -13,7 +13,7 @@ const Chat = (props) => {
     };
     socket.on("message", handleMessages);
     const chatMessages = document.querySelector(".chat-messages");
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    // chatMessages.scrollTop = chatMessages.scrollHeight;
     return () => {
       socket.off("message", handleMessages);
     };
