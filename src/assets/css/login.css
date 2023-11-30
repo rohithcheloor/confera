@@ -1,50 +1,55 @@
-@import url('https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap');
-body{
-    background: linear-gradient(45deg,#000000,#000154);
-    background-attachment: fixed;
+@import url("https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap");
+body {
+  background: linear-gradient(45deg, #000000, #000154);
+  background-attachment: fixed;
 }
-h1{
-    font-family: 'Tilt Neon', sans-serif;
-    font-size: 50px;
+h1 {
+  font-family: "Tilt Neon", sans-serif;
+  font-size: 50px;
 }
-.tab-content{
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
-    color: #ffffff;
-    background-color: #ffffff17;
-    padding-bottom: 1em;
+.tab-content {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  color: #ffffff;
+  background-color: #ffffff17;
+  padding-bottom: 1em;
 }
-.uname-container{
-    border-radius: 8px;
-    color: #ffffff;
-    background-color: #ffffff17;
-    padding: 1rem;
+.uname-container {
+  border-radius: 8px;
+  color: #ffffff;
+  background-color: #ffffff17;
+  padding: 1rem;
 }
-.nav-tabs{
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    background-color: #ffffff;
-    color: #ffffff;
+.nav-tabs {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background-color: #ffffff;
+  color: #ffffff;
 }
-.nav-tabs .nav-link:hover{
-    border-color: #000154;
-    border-radius: 0px;
-    background: linear-gradient(45deg,#000000,#000154) ;
-    color: #ffffff;
+.nav-tabs .nav-link:hover {
+  border-color: #000154;
+  border-radius: 0px;
+  background: linear-gradient(45deg, #000000, #000154);
+  color: #ffffff;
 }
-#room-tabs-tabpane-create,#room-tabs-tabpane-join{
-    padding: 1rem;
+#room-tabs-tabpane-create,
+#room-tabs-tabpane-join {
+  padding: 1rem;
 }
-.company-logo-container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.company-logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.company-logo{
-    max-width: 150px;
-    padding: 1em;
-    border: 3px solid #000154;
-    border-radius: 10px;
-    box-shadow: 0px 0px 15px #000000bc;
-    background-color: #ffffff;
+.company-logo {
+  max-width: 150px;
+  padding: 1em;
+  border: 3px solid #000154;
+  border-radius: 10px;
+  box-shadow: 0px 0px 15px #000000bc;
+  background-color: #ffffff;
+}
+
+.checkout {
+  text-align: center;
 }

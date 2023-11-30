@@ -361,6 +361,7 @@ class Login extends Component {
             </Tabs>
           </Row>
         )}
+        <Checkout />
       </Container>
     );
   }

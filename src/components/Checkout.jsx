@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "react-bootstrap";
 import PayPal from "../components/Paypal";
 
 function Checkout() {
@@ -9,16 +10,26 @@ function Checkout() {
       {checkout ? (
         <PayPal />
       ) : (
-        <button
+        <Button
           onClick={() => {
             setCheckOut(true);
           }}
+          variant="primary"
+          className="mt-3"
         >
           Donate!
-        </button>
+        </Button>
       )}
     </div>
   );
 }
 
 export default Checkout;
+
+<Button
+  onClick={() => this.handleJoinRoomWithLink()}
+  variant="primary"
+  className="mt-3"
+>
+  Join Room
+</Button>;
