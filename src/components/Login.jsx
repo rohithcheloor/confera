@@ -5,6 +5,7 @@ import { api_post } from "../utilities/apiRequest";
 import { LoginUser, setLoggedIn } from "../redux/action/loginActions";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
+import Checkout from "./Checkout";
 
 class Login extends Component {
   constructor(props) {
@@ -130,6 +131,7 @@ class Login extends Component {
         this.props.loginUser(
           createRoom.data.roomId,
           this.state.username,
+          this.state.enableSecureRoom ? this.state.password : null,
           createRoom.data.isPrivateRoom,
           createRoom.data.joinLink,
           true
@@ -189,7 +191,8 @@ class Login extends Component {
       this.props.loginUser(
         this.props.roomId,
         this.state.username,
-        this.props.enableSecureRoom,
+        this.props.password,
+        this.props.secureRoom,
         joinLink,
         true
       );
@@ -360,15 +363,17 @@ class Login extends Component {
             </Tabs>
           </Row>
         )}
+        <Checkout />
       </Container>
     );
   }
 }
 const mapStateToProps = (state) => {
-  const { roomId, username, secureRoom, joinLink, isLoggedIn } = state.login;
+  const { roomId, username, password = null, secureRoom, joinLink, isLoggedIn } = state.login;
   return {
     roomId,
     username,
+    password,
     secureRoom,
     joinLink,
     isLoggedIn,
@@ -376,8 +381,8 @@ const mapStateToProps = (state) => {
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    loginUser: (roomId, username, secureRoom, joinLink, isLoggedIn) =>
-      dispatch(LoginUser(roomId, username, secureRoom, joinLink, isLoggedIn)),
+    loginUser: (roomId, username, password = null, secureRoom, joinLink, isLoggedIn) =>
+      dispatch(LoginUser(roomId, username, password, secureRoom, joinLink, isLoggedIn)),
     setUserLoggedIn: () => dispatch(setLoggedIn()),
   };
 };

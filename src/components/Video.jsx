@@ -29,14 +29,12 @@ const VideoTile = (props) => {
       ref.current.play();
     });
     peer.on("close", (err) => {
-      console.log("close Update");
       ref.current.pause();
       if (ref.current) ref.current.srcObject = null;
       console.log(err);
     });
     peer.on("error", (err) => {
       ref.current.pause();
-      console.log("error Update");
       if (ref.current) ref.current.srcObject = null;
       console.log(err);
     });
