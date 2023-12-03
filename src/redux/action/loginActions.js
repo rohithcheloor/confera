@@ -3,6 +3,7 @@ import { LOGIN } from "../types";
 export const LoginUser = (
   roomId,
   username,
+  password,
   secureRoom,
   joinLink,
   isLoggedIn
@@ -10,7 +11,7 @@ export const LoginUser = (
   if (joinLink && joinLink.toString().trim() !== "") {
     joinLink = window.location.origin + "/join-with-link/" + joinLink;
   }
-  const payload = { roomId, username, secureRoom, joinLink, isLoggedIn };
+  const payload = { roomId, username,password, secureRoom, joinLink, isLoggedIn };
   return { type: LOGIN.LOGIN_USER, payload };
 };
 export const LogoutUser = () => {
@@ -19,6 +20,9 @@ export const LogoutUser = () => {
 
 export const setLoggedIn = () => {
   return { type: LOGIN.SET_LOGGED_IN };
+};
+export const setPassword = (password) => {
+  return { type: LOGIN.SET_LOGGED_IN, payload: { password } };
 };
 
 export const getLoginData = () => {

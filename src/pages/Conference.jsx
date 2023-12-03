@@ -504,7 +504,7 @@ const ConferencePage = (props) => {
 };
 
 const mapStateToProps = (state) => {
-  const { roomId, username, secureRoom, joinLink } = state.login;
+  const { roomId, username, password, secureRoom, joinLink } = state.login;
   const { cameraID, microphoneID, speakerID, isCameraOn, isMicOn } =
     state.devices;
   const { loading, orgName, orgLogo } = state.common;
@@ -512,6 +512,7 @@ const mapStateToProps = (state) => {
     userData: {
       roomId,
       username,
+      password,
       secureRoom,
       joinLink,
     },

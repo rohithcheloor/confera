@@ -3,6 +3,7 @@ import { LOGIN } from "../types";
 const initState = {
   roomId: null,
   username: null,
+  password: null,
   secureRoom: false,
   joinLink: null,
   isLoggedIn: false,
@@ -15,6 +16,7 @@ const LoginReducer = (state = initState, { type, payload = {} }) => {
         ...state,
         roomId: payload.roomId,
         username: payload.username,
+        password: payload.password,
         secureRoom: payload.secureRoom,
         joinLink: payload.joinLink,
         isLoggedIn: payload.isLoggedIn,
@@ -29,6 +31,8 @@ const LoginReducer = (state = initState, { type, payload = {} }) => {
       return state.joinLink;
     case LOGIN.SET_LOGGED_IN:
       return { ...state, isLoggedIn: true };
+    case LOGIN.SET_PASSWORD:
+      return { ...state, password: payload.password };
     default:
       return state;
   }
