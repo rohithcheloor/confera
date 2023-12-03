@@ -131,6 +131,7 @@ class Login extends Component {
         this.props.loginUser(
           createRoom.data.roomId,
           this.state.username,
+          this.state.enableSecureRoom ? this.state.password : null,
           createRoom.data.isPrivateRoom,
           createRoom.data.joinLink,
           true
@@ -190,7 +191,8 @@ class Login extends Component {
       this.props.loginUser(
         this.props.roomId,
         this.state.username,
-        this.props.enableSecureRoom,
+        this.props.password,
+        this.props.secureRoom,
         joinLink,
         true
       );
@@ -367,10 +369,11 @@ class Login extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  const { roomId, username, secureRoom, joinLink, isLoggedIn } = state.login;
+  const { roomId, username, password = null, secureRoom, joinLink, isLoggedIn } = state.login;
   return {
     roomId,
     username,
+    password,
     secureRoom,
     joinLink,
     isLoggedIn,
@@ -378,8 +381,8 @@ const mapStateToProps = (state) => {
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    loginUser: (roomId, username, secureRoom, joinLink, isLoggedIn) =>
-      dispatch(LoginUser(roomId, username, secureRoom, joinLink, isLoggedIn)),
+    loginUser: (roomId, username, password = null, secureRoom, joinLink, isLoggedIn) =>
+      dispatch(LoginUser(roomId, username, password, secureRoom, joinLink, isLoggedIn)),
     setUserLoggedIn: () => dispatch(setLoggedIn()),
   };
 };

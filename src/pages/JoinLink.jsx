@@ -17,6 +17,7 @@ const JoinLink = (props) => {
         props.loginUser(
           authenticateRoom.data.roomId,
           null,
+          authenticateRoom.data.isPrivateRoom ? authenticateRoom.data.password : null,
           authenticateRoom.data.isPrivateRoom,
           authenticateRoom.data.joinLink,
           false
@@ -56,8 +57,17 @@ const mapStateToProps = (state) => {
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    loginUser: (roomId, username, secureRoom, joinLink, isLoggedIn) =>
-      dispatch(LoginUser(roomId, username, secureRoom, joinLink, isLoggedIn)),
+    loginUser: (
+      roomId,
+      username,
+      password,
+      secureRoom,
+      joinLink,
+      isLoggedIn
+    ) =>
+      dispatch(
+        LoginUser(roomId, username, password, secureRoom, joinLink, isLoggedIn)
+      ),
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(JoinLink);
