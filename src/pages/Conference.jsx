@@ -31,14 +31,15 @@ import Chat from "../components/Chat";
 import Reaction from "../components/Reaction";
 
 const ConferencePage = (props) => {
-  const { userData, deviceData, toggleCamera, toggleMicrophone } = props;
+  const { userData, deviceData, toggleCamera, toggleMicrophone, isMobile } =
+    props;
   const { cameraID, microphoneID, isCameraOn, isMicOn } = deviceData;
   const { roomId, secureRoom, username, password } = userData;
   // Screen Recording
   const { status, startRecording, stopRecording, mediaBlobUrl, clearBlobUrl } =
     useReactMediaRecorder({
-      video: true,
-      screen: true,
+      video: isMobile ? false : true,
+      screen: isMobile ? false : true,
     });
 
   const [peers, setPeers] = useState([]);
@@ -436,7 +437,7 @@ const ConferencePage = (props) => {
               <FontAwesomeIcon icon={faMessage} className="font-icon" />
             </Button>
           </OverlayTrigger>
-          <OverlayTrigger
+          {!isMobile && <OverlayTrigger
             overlay={
               <Tooltip>
                 Turn {status !== "idle" ? "off" : "on"} Recording
@@ -450,7 +451,7 @@ const ConferencePage = (props) => {
             >
               <FontAwesomeIcon icon={faRecordVinyl} className="font-icon" />
             </Button>
-          </OverlayTrigger>
+          </OverlayTrigger>}
           {mediaBlobUrl && (
             <OverlayTrigger overlay={<Tooltip>Clear Recording</Tooltip>}>
               <Button
@@ -507,7 +508,7 @@ const mapStateToProps = (state) => {
   const { roomId, username, password, secureRoom, joinLink } = state.login;
   const { cameraID, microphoneID, speakerID, isCameraOn, isMicOn } =
     state.devices;
-  const { loading, orgName, orgLogo } = state.common;
+  const { loading, orgName, orgLogo, isMobile } = state.common;
   return {
     userData: {
       roomId,
@@ -526,6 +527,7 @@ const mapStateToProps = (state) => {
     loading,
     orgLogo,
     orgName,
+    isMobile,
   };
 };
 
