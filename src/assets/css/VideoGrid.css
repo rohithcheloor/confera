@@ -254,6 +254,10 @@ video:fullscreen {
   position: relative;
 }
 
+.roombutton-dropdown {
+  min-width: 0 !important;
+}
+
 .setup-input-grp {
   display: flex;
   justify-content: center;

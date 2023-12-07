@@ -11,6 +11,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.5.1",
+    "data-uri-to-buffer": "^6.0.1",
     "emoji-picker-react": "^4.5.16",
     "process": "^0.11.10",
     "react": "^18.2.0",
