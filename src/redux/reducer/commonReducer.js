@@ -24,7 +24,7 @@ const CommonReducer = (state = initState, { type, payload = {} }) => {
     case COMMON.SET_ORG_LOGO:
       return { ...state, orgLogo: payload.orgLogo };
     case COMMON.SET_MOBILE:
-      return { ...state, isMobile: false };
+      return { ...state, isMobile: true };
     default:
       return state;
   }
