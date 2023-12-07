@@ -23,10 +23,12 @@ import {
   faSmile,
   faRecordVinyl,
   faEraser,
+  faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import { toggleCamera, toggleMicrophone } from "../redux/action/deviceActions";
 import { createPosterImage } from "../utilities/imageMaker";
+import { api_post } from "../utilities/apiRequest";
 import Chat from "../components/Chat";
 import Reaction from "../components/Reaction";
 
@@ -121,6 +123,82 @@ const ConferencePage = (props) => {
       clearBlobUrl();
     }
   };
+
+  const saveRecording = () => {
+    if (mediaBlobUrl) {
+      const convertAndSave = async () => {
+        try {
+          const blob = await fetch(mediaBlobUrl).then((res) => res.blob());
+
+          // Create FormData and append the Blob
+          const formData = new FormData();
+          formData.append("video", blob, "recording.webm");
+
+          api_post(`api/upload/${roomId}`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+            .then((res) => {
+              if (res.data) {
+                toast.success(res.data.message, {
+                  position: "bottom-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "colored",
+                });
+              } else {
+                if (res.data.message) {
+                  toast.success(res.message, {
+                    position: "bottom-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                  });
+                }
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              toast.error("An unexpected error occurred", {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+              });
+            });
+        } catch (error) {
+          console.error("Error fetching Blob:", error);
+        }
+      };
+
+      convertAndSave();
+    } else {
+      toast.warning("Please stop recording before saving.", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  };
+
   useEffect(() => {
     socketRef.current = io(API_SERVER_URL);
     const constraints = {
@@ -437,21 +515,23 @@ const ConferencePage = (props) => {
               <FontAwesomeIcon icon={faMessage} className="font-icon" />
             </Button>
           </OverlayTrigger>
-          {!isMobile && <OverlayTrigger
-            overlay={
-              <Tooltip>
-                Turn {status !== "idle" ? "off" : "on"} Recording
-              </Tooltip>
-            }
-          >
-            <Button
-              variant={status !== "idle" ? "success" : "danger"}
-              onClick={toggleRecording}
-              className={`roombutton`}
+          {!isMobile && (
+            <OverlayTrigger
+              overlay={
+                <Tooltip>
+                  Turn {status !== "idle" ? "off" : "on"} Recording
+                </Tooltip>
+              }
             >
-              <FontAwesomeIcon icon={faRecordVinyl} className="font-icon" />
-            </Button>
-          </OverlayTrigger>}
+              <Button
+                variant={status !== "idle" ? "success" : "danger"}
+                onClick={toggleRecording}
+                className={`roombutton`}
+              >
+                <FontAwesomeIcon icon={faRecordVinyl} className="font-icon" />
+              </Button>
+            </OverlayTrigger>
+          )}
           {mediaBlobUrl && (
             <OverlayTrigger overlay={<Tooltip>Clear Recording</Tooltip>}>
               <Button
@@ -460,6 +540,17 @@ const ConferencePage = (props) => {
                 className={`roombutton`}
               >
                 <FontAwesomeIcon icon={faEraser} className="font-icon" />
+              </Button>
+            </OverlayTrigger>
+          )}
+          {mediaBlobUrl && (
+            <OverlayTrigger overlay={<Tooltip>Save Recording</Tooltip>}>
+              <Button
+                variant={status !== "idle" ? "success" : "danger"}
+                onClick={saveRecording}
+                className={`roombutton`}
+              >
+                <FontAwesomeIcon icon={faSave} className="font-icon" />
               </Button>
             </OverlayTrigger>
           )}
