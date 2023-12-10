@@ -29,4 +29,5 @@ const CommonReducer = (state = initState, { type, payload = {} }) => {
       return state;
   }
 };
+
 export default CommonReducer;

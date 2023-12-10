@@ -125,9 +125,11 @@ const Setup = (props) => {
   }, [cameraID, microphoneID, isCameraOn, isMicOn]);
 
   useEffect(() => {
+    const video = videoRef.current;
+
     if (!isMobile) {
       const setSpeaker = () => {
-        if (videoRef.current && speakerID) {
+        if (video && video.setSinkId && speakerID) {
           videoRef.current.setSinkId(speakerID);
         }
       };
