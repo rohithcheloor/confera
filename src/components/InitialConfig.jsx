@@ -19,14 +19,8 @@ const InitialConfig = (props) => {
     setMobileDevice,
   } = props;
   useEffect(() => {
-    // if (
     //   /Mobi|Android|iPhone|iPad|Windows Phone|Mobile|Silk|GT-(I|N7|N8|N7P)|SC-02C|SC-03D|SC-05D|SH|SCH|SGH|SPH|SGH-(I|N7|T|T779)|SM-(G|N9|T|N9|P|T|N900|N9005)|SPH-L|SGH-I|LG-(E|MS|P|R|US|AS|V|VS|LS|SU|C|L|K)|DROID|Razr|XOOM|Macintosh/i.test(
     //     navigator.userAgent
-    //   )
-    // )
-    //  {
-    //   setMobileDevice();
-    // }
     const isMobileDevice =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
         navigator.userAgent
