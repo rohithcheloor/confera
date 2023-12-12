@@ -445,7 +445,7 @@ const ConferencePage = (props) => {
             }
           >
             <Button
-              variant={status !== "idle" ? "success" : "danger"}
+              variant={status !== "idle" ? "danger" : "success"}
               onClick={toggleRecording}
               className={`roombutton`}
             >
