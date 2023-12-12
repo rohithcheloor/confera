@@ -171,6 +171,7 @@ class Login extends Component {
         this.props.loginUser(
           this.state.roomId,
           this.state.username,
+          this.state.password,
           this.state.enableSecureRoom,
           authenticateRoom.data.joinLink,
           true
