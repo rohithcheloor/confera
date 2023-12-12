@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Container, Row, Col, Form, Button, Tabs, Tab } from "react-bootstrap";
 import "../assets/css/login.css";
-import { api_post } from "../utilities/apiRequest";
+import { api_post, api_get } from "../utilities/apiRequest";
 import { LoginUser, setLoggedIn } from "../redux/action/loginActions";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
@@ -18,6 +18,7 @@ class Login extends Component {
       username: "",
       enableSecureRoom: false,
       userId: "",
+      downloadRecId: null,
       tabState: "join",
     };
   }
@@ -103,9 +104,15 @@ class Login extends Component {
 
   handleInputChange = (e) => {
     const { name, value, type } = e.target;
-    this.setState({
-      [name]: type === "checkbox" ? e.target.checked : value,
-    });
+    if (name === "downloadRecId") {
+      this.setState({
+        [name]: this.sanitizeRoomIdInput(value),
+      });
+    } else {
+      this.setState({
+        [name]: type === "checkbox" ? e.target.checked : value,
+      });
+    }
     if (type === "checkbox") {
       this.handleRoomPrivacyChange(e.target.checked);
     }
@@ -164,6 +171,7 @@ class Login extends Component {
         this.props.loginUser(
           this.state.roomId,
           this.state.username,
+          this.state.password,
           this.state.enableSecureRoom,
           authenticateRoom.data.joinLink,
           true
@@ -196,6 +204,47 @@ class Login extends Component {
         joinLink,
         true
       );
+    }
+  };
+
+  handleDownloads = async () => {
+    const recordings = await api_get(`api/videos/${this.state.downloadRecId}`);
+    const list = recordings.data.videoLinks;
+    if (list.length) {
+      // Create a temporary container to hold the anchor elements
+      const container = document.createElement("div");
+
+      // Iterate over the videoLinks array and create anchor elements
+      list.forEach((videoLink, index) => {
+        const anchor = document.createElement("a");
+        anchor.href = videoLink;
+        anchor.target = "_blank"; // Open in a new tab/window
+        anchor.download = `video_${index + 1}.mp4`; // Set the desired file name
+
+        // Append the anchor to the container
+        container.appendChild(anchor);
+      });
+
+      // Append the container to the body (you may modify this based on your application structure)
+      document.body.appendChild(container);
+
+      // Programmatically click each anchor to trigger downloads
+      const anchors = container.querySelectorAll("a");
+      anchors.forEach((anchor) => anchor.click());
+
+      // Remove the temporary container from the DOM
+      document.body.removeChild(container);
+    } else {
+      toast.error("No recordings found!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     }
   };
 
@@ -360,6 +409,33 @@ class Login extends Component {
                   </Button>
                 </Col>
               </Tab>
+              <Tab eventKey="download" title="Download Recordings">
+                <Col style={{ padding: "15px" }}>
+                  <Form>
+                    <Form.Group controlId="downloadRecId">
+                      <Form.Label>Room ID:</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="downloadRecId"
+                        value={this.state.downloadRecId}
+                        onChange={this.handleInputChange}
+                        maxLength="14"
+                        pattern="\d{4}-\d{4}-\d{4}"
+                        placeholder="1234-5678-9012"
+                      />
+                    </Form.Group>
+                  </Form>
+
+                  <Button
+                    onClick={() => this.handleDownloads()}
+                    variant="primary"
+                    className="mt-3"
+                    disabled={this.state.roomId.length !== 14}
+                  >
+                    Download
+                  </Button>
+                </Col>
+              </Tab>
             </Tabs>
           </Row>
         )}
@@ -369,7 +445,14 @@ class Login extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  const { roomId, username, password = null, secureRoom, joinLink, isLoggedIn } = state.login;
+  const {
+    roomId,
+    username,
+    password = null,
+    secureRoom,
+    joinLink,
+    isLoggedIn,
+  } = state.login;
   return {
     roomId,
     username,
@@ -381,8 +464,17 @@ const mapStateToProps = (state) => {
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    loginUser: (roomId, username, password = null, secureRoom, joinLink, isLoggedIn) =>
-      dispatch(LoginUser(roomId, username, password, secureRoom, joinLink, isLoggedIn)),
+    loginUser: (
+      roomId,
+      username,
+      password = null,
+      secureRoom,
+      joinLink,
+      isLoggedIn
+    ) =>
+      dispatch(
+        LoginUser(roomId, username, password, secureRoom, joinLink, isLoggedIn)
+      ),
     setUserLoggedIn: () => dispatch(setLoggedIn()),
   };
 };

@@ -9,7 +9,13 @@ import { connect } from "react-redux";
 import { API_SERVER_URL } from "../utilities/constants";
 import RoomDetailsMenu from "../components/RoomDetails";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, ButtonGroup, OverlayTrigger, Tooltip } from "react-bootstrap";
+import {
+  Button,
+  ButtonGroup,
+  OverlayTrigger,
+  Tooltip,
+  Dropdown,
+} from "react-bootstrap";
 import {
   faVideo,
   faVideoSlash,
@@ -23,10 +29,19 @@ import {
   faSmile,
   faRecordVinyl,
   faEraser,
+  faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
-import { toggleCamera, toggleMicrophone } from "../redux/action/deviceActions";
+import {
+  toggleCamera,
+  toggleMicrophone,
+  setCamera,
+  setMicrophone,
+  setSpeaker,
+} from "../redux/action/deviceActions";
+
 import { createPosterImage } from "../utilities/imageMaker";
+import { api_post } from "../utilities/apiRequest";
 import Chat from "../components/Chat";
 import Reaction from "../components/Reaction";
 
@@ -35,6 +50,8 @@ const ConferencePage = (props) => {
     props;
   const { cameraID, microphoneID, isCameraOn, isMicOn } = deviceData;
   const { roomId, secureRoom, username, password } = userData;
+  const { setCameraID, setMicrophoneID, setSpeakerID } = props;
+
   // Screen Recording
   const { status, startRecording, stopRecording, mediaBlobUrl, clearBlobUrl } =
     useReactMediaRecorder({
@@ -48,6 +65,13 @@ const ConferencePage = (props) => {
   const [myPosterImage, setMyPosterImage] = useState(null);
   const [showChat, setShowChat] = useState(false);
   const [showReaction, setShowReaction] = useState(false);
+  const [videoDevices, setVideoDevices] = useState([]);
+  const [audioDevices, setAudioDevices] = useState([]);
+  const [videoDeviceName, setVideoDeviceName] = useState(null);
+  const [audioDeviceName, setAudioDeviceName] = useState(null);
+  const [speakerDeviceName, setSpeakerDeviceName] = useState(null);
+
+  const [speakerDevices, setSpeakerDevices] = useState([]);
 
   const videoRef = useRef();
   const peersRef = useRef([]);
@@ -68,6 +92,21 @@ const ConferencePage = (props) => {
   const handleMyView = () => {
     videoRef.current.style.setProperty("display", myView ? "none" : "");
     setMyView(!myView);
+  };
+
+  const handleCameraChange = (id, name) => {
+    setCameraID(id);
+    setVideoDeviceName(name);
+  };
+
+  const handleMicChange = (id, name) => {
+    setMicrophoneID(id);
+    setAudioDeviceName(name);
+  };
+
+  const handleSpeakerChange = (id, name) => {
+    setSpeakerID(id);
+    setSpeakerDeviceName(name);
   };
 
   const handleChatView = () => {
@@ -121,6 +160,82 @@ const ConferencePage = (props) => {
       clearBlobUrl();
     }
   };
+
+  const saveRecording = () => {
+    if (mediaBlobUrl) {
+      const convertAndSave = async () => {
+        try {
+          const blob = await fetch(mediaBlobUrl).then((res) => res.blob());
+
+          // Create FormData and append the Blob
+          const formData = new FormData();
+          formData.append("video", blob, "recording.webm");
+
+          api_post(`api/upload/${roomId}`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+            .then((res) => {
+              if (res.data) {
+                toast.success(res.data.message, {
+                  position: "bottom-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "colored",
+                });
+              } else {
+                if (res.data.message) {
+                  toast.success(res.message, {
+                    position: "bottom-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                  });
+                }
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              toast.error("An unexpected error occurred", {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+              });
+            });
+        } catch (error) {
+          console.error("Error fetching Blob:", error);
+        }
+      };
+
+      convertAndSave();
+    } else {
+      toast.warning("Please stop recording before saving.", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  };
+
   useEffect(() => {
     socketRef.current = io(API_SERVER_URL);
     const constraints = {
@@ -327,6 +442,41 @@ const ConferencePage = (props) => {
     }
   }, [myPosterImage]);
 
+  useEffect(() => {
+    const getMediaDevices = async () => {
+      try {
+        await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices =
+          devices && devices.filter((device) => device.kind === "videoinput");
+        const audioDevices =
+          devices && devices.filter((device) => device.kind === "audioinput");
+        const speakerDevices =
+          devices && devices.filter((device) => device.kind === "audiooutput");
+        setVideoDevices(videoDevices);
+        setAudioDevices(audioDevices);
+        if (videoDevices && videoDevices.length > 0) {
+          setVideoDeviceName(videoDevices[0]?.label || "No device selected");
+          setCameraID(videoDevices[0]?.deviceId || null);
+        }
+        if (audioDevices && audioDevices.length > 0) {
+          setAudioDeviceName(audioDevices[0]?.label || "No device selected");
+          setMicrophoneID(audioDevices[0]?.deviceId || null);
+        }
+        if (speakerDevices && speakerDevices.length > 0) {
+          setSpeakerDeviceName(
+            speakerDevices[0]?.label || "No device selected"
+          );
+          setSpeakerID(speakerDevices[0]?.deviceId);
+          setSpeakerDevices(speakerDevices);
+        }
+      } catch (error) {
+        console.error("Error fetching media devices:", error);
+      }
+    };
+    getMediaDevices();
+  }, []);
+
   return (
     <React.Fragment>
       <header>
@@ -369,31 +519,77 @@ const ConferencePage = (props) => {
           <OverlayTrigger
             overlay={<Tooltip>Turn {isCameraOn ? "off" : "on"} Video</Tooltip>}
           >
-            <Button
-              variant={isCameraOn ? "success" : "danger"}
-              onClick={handleCamera}
-              className={`roombutton`}
-            >
-              <FontAwesomeIcon
-                icon={isCameraOn ? faVideo : faVideoSlash}
-                className="font-icon"
+            <Dropdown as={ButtonGroup} alignRight>
+              <Button
+                variant={isCameraOn ? "success" : "danger"}
+                onClick={handleCamera}
+                className={`roombutton`}
+              >
+                <FontAwesomeIcon
+                  icon={isCameraOn ? faVideo : faVideoSlash}
+                  className="font-icon"
+                />
+              </Button>
+              <Dropdown.Toggle
+                split
+                variant="success"
+                id="dropdown-split-basic"
+                className="btn-sm roombutton-dropdown"
               />
-            </Button>
+
+              <Dropdown.Menu>
+                {videoDevices.map((device, index) => (
+                  <Dropdown.Item
+                    key={`vid_device_${index}`}
+                    onClick={() =>
+                      handleCameraChange(device.deviceId, device.label)
+                    }
+                  >
+                    {device.label ||
+                      `Camera ${device.deviceId.substring(0, 5)}`}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
           </OverlayTrigger>
           <OverlayTrigger
             overlay={<Tooltip>Turn {isMicOn ? "off" : "on"} Mic </Tooltip>}
           >
-            <Button
-              variant={isMicOn ? "success" : "danger"}
-              onClick={handleMicrophone}
-              className={`roombutton`}
-            >
-              <FontAwesomeIcon
-                icon={isMicOn ? faMicrophone : faMicrophoneSlash}
-                className="font-icon"
+            <Dropdown as={ButtonGroup} alignRight>
+              <Button
+                variant={isMicOn ? "success" : "danger"}
+                onClick={handleMicrophone}
+                className={`roombutton`}
+              >
+                <FontAwesomeIcon
+                  icon={isMicOn ? faMicrophone : faMicrophoneSlash}
+                  className="font-icon"
+                />
+              </Button>
+
+              <Dropdown.Toggle
+                split
+                variant="success"
+                id="dropdown-split-basic"
+                className="btn-sm roombutton-dropdown"
               />
-            </Button>
+
+              <Dropdown.Menu>
+                {audioDevices.map((device, index) => (
+                  <Dropdown.Item
+                    key={`aud_device_${index}`}
+                    onClick={() =>
+                      handleMicChange(device.deviceId, device.label)
+                    }
+                  >
+                    {device.label ||
+                      `Microphone ${device.deviceId.substring(0, 5)}`}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
           </OverlayTrigger>
+
           <OverlayTrigger overlay={<Tooltip>Show Room Information</Tooltip>}>
             <Button
               variant="success"
@@ -437,21 +633,23 @@ const ConferencePage = (props) => {
               <FontAwesomeIcon icon={faMessage} className="font-icon" />
             </Button>
           </OverlayTrigger>
-          {!isMobile && <OverlayTrigger
-            overlay={
-              <Tooltip>
-                Turn {status !== "idle" ? "off" : "on"} Recording
-              </Tooltip>
-            }
-          >
-            <Button
-              variant={status !== "idle" ? "success" : "danger"}
-              onClick={toggleRecording}
-              className={`roombutton`}
+          {!isMobile && (
+            <OverlayTrigger
+              overlay={
+                <Tooltip>
+                  Turn {status !== "idle" ? "off" : "on"} Recording
+                </Tooltip>
+              }
             >
-              <FontAwesomeIcon icon={faRecordVinyl} className="font-icon" />
-            </Button>
-          </OverlayTrigger>}
+              <Button
+                variant={status !== "idle" ? "danger" : "success"}
+                onClick={toggleRecording}
+                className={`roombutton`}
+              >
+                <FontAwesomeIcon icon={faRecordVinyl} className="font-icon" />
+              </Button>
+            </OverlayTrigger>
+          )}
           {mediaBlobUrl && (
             <OverlayTrigger overlay={<Tooltip>Clear Recording</Tooltip>}>
               <Button
@@ -460,6 +658,17 @@ const ConferencePage = (props) => {
                 className={`roombutton`}
               >
                 <FontAwesomeIcon icon={faEraser} className="font-icon" />
+              </Button>
+            </OverlayTrigger>
+          )}
+          {mediaBlobUrl && (
+            <OverlayTrigger overlay={<Tooltip>Save Recording</Tooltip>}>
+              <Button
+                variant={status !== "idle" ? "success" : "danger"}
+                onClick={saveRecording}
+                className={`roombutton`}
+              >
+                <FontAwesomeIcon icon={faSave} className="font-icon" />
               </Button>
             </OverlayTrigger>
           )}
@@ -535,6 +744,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     toggleCamera: () => dispatch(toggleCamera()),
     toggleMicrophone: () => dispatch(toggleMicrophone()),
+    setCameraID: (camID) => dispatch(setCamera(camID)),
+    setMicrophoneID: (micID) => dispatch(setMicrophone(micID)),
+    setSpeakerID: (spID) => dispatch(setSpeaker(spID)),
   };
 };
 

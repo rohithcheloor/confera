@@ -201,9 +201,6 @@ video:fullscreen {
 .mirror {
   width: 100%;
   padding: 1em;
-  -webkit-transform: rotateY(180deg);
-  -moz-transform: rotateY(180deg);
-  transform: rotateY(180deg);
 }
 
 .blur {
@@ -252,6 +249,10 @@ video:fullscreen {
 
 .video-container {
   position: relative;
+}
+
+.roombutton-dropdown {
+  min-width: 0 !important;
 }
 
 .setup-input-grp {
