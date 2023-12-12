@@ -104,9 +104,15 @@ class Login extends Component {
 
   handleInputChange = (e) => {
     const { name, value, type } = e.target;
-    this.setState({
-      [name]: type === "checkbox" ? e.target.checked : value,
-    });
+    if (name === "downloadRecId") {
+      this.setState({
+        [name]: this.sanitizeRoomIdInput(value),
+      });
+    } else {
+      this.setState({
+        [name]: type === "checkbox" ? e.target.checked : value,
+      });
+    }
     if (type === "checkbox") {
       this.handleRoomPrivacyChange(e.target.checked);
     }
@@ -165,6 +171,7 @@ class Login extends Component {
         this.props.loginUser(
           this.state.roomId,
           this.state.username,
+          this.state.password,
           this.state.enableSecureRoom,
           authenticateRoom.data.joinLink,
           true

@@ -34,7 +34,9 @@ const Chat = (props) => {
           </div>
         );
       };
-      toast(<ChatMessage />);
+      if(message.text){
+        toast(<ChatMessage />);
+      }
     }
     const div = document.createElement("div");
     div.classList.add("message");
